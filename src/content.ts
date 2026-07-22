@@ -19,7 +19,6 @@ export const hero = {
     },
   ],
   primaryCta: 'Jetzt Platz sichern',
-  secondaryCta: 'Infos anfordern',
   price: '1.000 € netto',
   seats: 'Max. 12 Teilnehmer · DE & AT',
 }
@@ -72,28 +71,6 @@ export const rules = {
   ],
   disclaimer:
     'Praxisnahe Führungskräfte-Unterweisung zur gesetzlichen Nachweispflicht (DE: § 38 BSIG · AT: NISG 2026) – ersetzt keine individuelle Rechts- oder Steuerberatung.',
-}
-
-export const lead = {
-  id: 'lead',
-  title: 'Lead-Generator: Infos & nächsten Termin',
-  lead: 'Noch nicht buchungsbereit? Hinterlassen Sie Firma und E-Mail – Sie erhalten Termindetails und die Kurzübersicht zur Nachweispflicht nach § 38 BSIG (DE) und NISG 2026 (AT).',
-  submit: 'Infos anfordern',
-  submitting: 'Wird gesendet…',
-  successTitle: 'Danke – Lead eingegangen',
-  successText:
-    'Wir melden uns mit Termin und den nächsten Schritten. Kein Spam, kein Newsletter-Marathon.',
-  bookCta: 'Lieber direkt buchen',
-  fields: {
-    name: 'Name',
-    company: 'Unternehmen',
-    email: 'E-Mail',
-    phone: 'Telefon (optional)',
-    market: 'Markt',
-  },
-  marketOptions: ['Deutschland (BSIG / NIS-2)', 'Österreich (NISG 2026)', 'Beide / Konzern DE+AT'],
-  consent:
-    'Ich willige ein, dass meine Angaben zur Kontaktaufnahme gespeichert und verarbeitet werden (DSGVO).',
 }
 
 export const cta = {

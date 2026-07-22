@@ -29,9 +29,6 @@ export function Hero() {
           <a className="btn btn--primary" href="#anmeldung">
             {hero.primaryCta} – {hero.price}
           </a>
-          <a className="btn btn--ghost" href="#lead">
-            {hero.secondaryCta}
-          </a>
           <span className="hero__seats">{hero.seats}</span>
         </div>
       </div>

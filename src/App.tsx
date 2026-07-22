@@ -3,7 +3,6 @@ import { Agenda } from './components/Agenda'
 import { CtaForm } from './components/CtaForm'
 import { Footer } from './components/Footer'
 import { Hero } from './components/Hero'
-import { LeadGen } from './components/LeadGen'
 import { Problem } from './components/Problem'
 import { Rules } from './components/Rules'
 
@@ -37,7 +36,6 @@ export default function App() {
       <Hero />
       <main>
         <Problem />
-        <LeadGen />
         <Agenda />
         <Rules />
         <CtaForm />
