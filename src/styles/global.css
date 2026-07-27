@@ -34,11 +34,14 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   font-family: var(--font-body);
   font-size: 1.05rem;
   line-height: 1.65;
@@ -46,10 +49,13 @@ body {
   background: var(--navy-950);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 a {
@@ -87,6 +93,8 @@ ol {
 
 .page {
   overflow-x: clip;
+  width: 100%;
+  max-width: 100vw;
 }
 
 /* —— Buttons —— */
@@ -103,6 +111,8 @@ ol {
   font-weight: 600;
   letter-spacing: 0.01em;
   cursor: pointer;
+  text-align: center;
+  max-width: 100%;
   transition:
     transform 0.25s var(--ease),
     background 0.25s var(--ease),
@@ -149,13 +159,19 @@ ol {
 .hero {
   position: relative;
   min-height: 100svh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 1.25rem clamp(1.25rem, 4vw, 3rem) clamp(3rem, 8vh, 5.5rem);
+  padding:
+    max(4.5rem, calc(env(safe-area-inset-top, 0px) + 3.5rem))
+    clamp(1rem, 4vw, 3rem)
+    max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem));
   isolation: isolate;
   text-align: center;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .hero__backdrop {
@@ -198,16 +214,21 @@ ol {
   top: 0;
   left: 0;
   right: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 1.25rem clamp(1.25rem, 4vw, 3rem);
+  padding:
+    max(0.85rem, env(safe-area-inset-top, 0px))
+    clamp(1rem, 4vw, 3rem)
+    0.85rem;
 }
 
 .hero__logo {
   display: block;
   width: auto;
   height: auto;
+  max-width: 100%;
   background: #fff;
   border-radius: 4px;
   margin-inline: auto;
@@ -239,26 +260,33 @@ ol {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
 }
 
 .hero__brand-mark {
   margin: 0 0 var(--space-3);
   line-height: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .hero__headline {
-  font-size: clamp(1.45rem, 3vw, 1.95rem);
+  font-size: clamp(1.35rem, 4.2vw, 1.95rem);
   font-weight: 600;
   max-width: 28ch;
   margin-bottom: var(--space-2);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .hero__subline {
   color: var(--steel-100);
   max-width: 40ch;
   margin-bottom: var(--space-3);
-  font-size: 1.08rem;
+  font-size: clamp(0.98rem, 2.8vw, 1.08rem);
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .hero__facts {
@@ -270,6 +298,7 @@ ol {
   max-width: 40rem;
   width: 100%;
   text-align: left;
+  min-width: 0;
 }
 
 .hero__fact {
@@ -277,6 +306,7 @@ ol {
   gap: 0.15rem;
   padding-left: 0.85rem;
   border-left: 2px solid var(--accent);
+  min-width: 0;
 }
 
 .hero__fact-label {
@@ -291,6 +321,7 @@ ol {
   color: var(--steel-100);
   font-size: 0.98rem;
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .hero__actions {
@@ -299,6 +330,11 @@ ol {
   align-items: center;
   justify-content: center;
   gap: 0.85rem 1.25rem;
+  width: 100%;
+}
+
+.hero__actions .btn {
+  width: auto;
 }
 
 .hero__seats {
@@ -555,12 +591,15 @@ ol {
 
 .field__input {
   min-height: 3rem;
+  width: 100%;
+  max-width: 100%;
   padding: 0.65rem 0.85rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: rgba(7, 19, 31, 0.65);
   color: var(--text);
   outline: none;
+  font-size: 1rem;
   transition:
     border-color 0.2s var(--ease),
     box-shadow 0.2s var(--ease);
@@ -701,7 +740,8 @@ ol {
 
 .footer__nav {
   display: flex;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.85rem 1.25rem;
 }
 
 .footer__link {
@@ -767,17 +807,154 @@ ol {
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 720px) {
+  body {
+    font-size: 1rem;
+  }
+
   .hero {
-    justify-content: center;
-    padding-bottom: 2.5rem;
+    min-height: auto;
+    justify-content: flex-start;
+    padding-top: max(4.25rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
+    padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px) + 1.5rem);
   }
 
   .hero__logo--hero {
-    width: min(100%, 16rem);
+    width: min(100%, 14.5rem);
+    padding: 0.45rem 0.55rem;
+  }
+
+  .hero__headline {
+    max-width: none;
+    font-size: clamp(1.28rem, 6.2vw, 1.65rem);
+  }
+
+  .hero__subline {
+    max-width: none;
+  }
+
+  .hero__facts {
+    gap: 0.75rem;
+    margin-bottom: var(--space-3);
+  }
+
+  .hero__fact-text {
+    font-size: 0.94rem;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero__actions .btn {
+    width: 100%;
+    white-space: normal;
+    line-height: 1.35;
+    padding-inline: 1rem;
+  }
+
+  .hero__seats {
+    text-align: center;
   }
 
   .section {
-    padding-block: var(--space-5);
+    padding: var(--space-5) clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .section__title {
+    max-width: none;
+    font-size: clamp(1.55rem, 6.5vw, 2.1rem);
+  }
+
+  .section__lead {
+    max-width: none;
+    font-size: 1rem;
+  }
+
+  .problem-sentences__item {
+    max-width: none;
+    font-size: 1.05rem;
+  }
+
+  .agenda-list__item {
+    grid-template-columns: 3.75rem 1fr;
+    gap: 0.85rem;
+    padding: 1rem 0;
+  }
+
+  .agenda-list__time {
+    font-size: 1rem;
+  }
+
+  .agenda-list__title {
+    font-size: 1.1rem;
+  }
+
+  .rules-list__text,
+  .rules-disclaimer {
+    max-width: none;
+  }
+
+  .funnel-steps {
+    gap: 0.35rem;
+  }
+
+  .funnel-steps__item {
+    font-size: 0.72rem;
+    gap: 0.25rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .funnel-steps__num {
+    font-size: 0.9rem;
+  }
+
+  .funnel-actions {
+    flex-direction: column;
+  }
+
+  .funnel-actions .btn {
+    width: 100%;
+  }
+
+  .btn--wide {
+    max-width: none;
+  }
+
+  .footer {
+    padding:
+      var(--space-4)
+      clamp(1rem, 4vw, 1.5rem)
+      max(var(--space-5), calc(env(safe-area-inset-bottom, 0px) + 2rem));
+  }
+
+  .footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer__logo {
+    height: 3.5rem;
+    max-width: 10.5rem;
+  }
+
+  .footer__note {
+    max-width: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero__logo--hero {
+    width: min(100%, 12.5rem);
+  }
+
+  .funnel-steps__item {
+    font-size: 0.65rem;
+  }
+
+  .agenda-list__item {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
   }
 }
