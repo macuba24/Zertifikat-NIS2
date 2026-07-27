@@ -33,6 +33,7 @@ function buildOwnerText(body) {
     return [
       '=== Lead Zertifikatsschulung ===',
       `Name: ${asString(body.name)}`,
+      `Name des Teilnehmers: ${asString(body.name)}`,
       `Unternehmen: ${asString(body.company)}`,
       `E-Mail: ${asString(body.email)}`,
       `Telefon: ${asString(body.phone)}`,
@@ -55,10 +56,10 @@ function buildOwnerText(body) {
 
   return [
     '=== Buchungsanfrage Zertifikatsschulung ===',
+    `Name des Teilnehmers: ${asString(body.gfName)}`,
     `Unternehmen: ${asString(body.company)}`,
     `Rechtsform: ${asString(body.legalForm)}`,
     `USt-IdNr.: ${asString(body.vatId)}`,
-    `Geschäftsführung / Teilnehmer: ${asString(body.gfName)}`,
     `E-Mail: ${asString(body.email)}`,
     `Telefon: ${asString(body.phone)}`,
     `Markt: ${asString(body.market)}`,

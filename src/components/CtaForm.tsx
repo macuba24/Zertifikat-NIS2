@@ -102,6 +102,16 @@ export function CtaForm() {
             <div hidden={step !== 0}>
               <div className="cta-form__grid">
                 <label className="field field--full">
+                  <span className="field__label">{cta.fields.gfName}</span>
+                  <input
+                    className="field__input"
+                    name="gfName"
+                    required={step === 0}
+                    autoComplete="name"
+                    placeholder="Vor- und Nachname"
+                  />
+                </label>
+                <label className="field field--full">
                   <span className="field__label">{cta.fields.company}</span>
                   <input className="field__input" name="company" required={step === 0} autoComplete="organization" />
                 </label>
@@ -112,10 +122,6 @@ export function CtaForm() {
                 <label className="field">
                   <span className="field__label">{cta.fields.vatId}</span>
                   <input className="field__input" name="vatId" autoComplete="off" />
-                </label>
-                <label className="field">
-                  <span className="field__label">{cta.fields.gfName}</span>
-                  <input className="field__input" name="gfName" required={step === 0} autoComplete="name" />
                 </label>
                 <label className="field">
                   <span className="field__label">{cta.fields.email}</span>

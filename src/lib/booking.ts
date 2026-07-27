@@ -104,7 +104,32 @@ function defaultConfirmText(event: BookingEvent | LeadEvent): string {
 }
 
 function defaultOwnerText(event: BookingEvent | LeadEvent): string {
-  return JSON.stringify(event, null, 2)
+  if (event.event === 'lead.created') {
+    return [
+      '=== Lead Zertifikatsschulung ===',
+      `Name des Teilnehmers: ${event.name}`,
+      `Unternehmen: ${event.company}`,
+      `E-Mail: ${event.email}`,
+      `Telefon: ${event.phone || '—'}`,
+      `Markt: ${event.market}`,
+      `Zeitpunkt: ${event.createdAt}`,
+    ].join('\n')
+  }
+  return [
+    '=== Buchungsanfrage Zertifikatsschulung ===',
+    `Name des Teilnehmers: ${event.gfName}`,
+    `Unternehmen: ${event.company}`,
+    `Rechtsform: ${event.legalForm}`,
+    `USt-IdNr.: ${event.vatId || '—'}`,
+    `E-Mail: ${event.email}`,
+    `Telefon: ${event.phone || '—'}`,
+    `Markt: ${event.market}`,
+    `Zahlungsart: ${event.paymentMethod}`,
+    `Bemerkung: ${event.notes || '—'}`,
+    `Status: ${event.status}`,
+    `Preis: ${event.priceNetEur} ${event.currency} netto`,
+    `Zeitpunkt: ${event.createdAt}`,
+  ].join('\n')
 }
 
 async function postFormSubmit(
@@ -112,21 +137,24 @@ async function postFormSubmit(
   meta: FallbackMeta = {},
 ): Promise<SubmitResult> {
   const to = meta.to || contactEmail
+  const participantName = 'gfName' in event ? event.gfName : event.name
   const ownerSubject =
     meta.ownerSubject ||
     (event.event === 'lead.created'
-      ? `Lead Zertifikatsschulung – ${event.company}`
-      : `Buchung Zertifikatsschulung – ${event.company}`)
+      ? `Lead Zertifikatsschulung – ${participantName} / ${event.company}`
+      : `Buchung Zertifikatsschulung – ${participantName} / ${event.company}`)
   const ownerText = meta.ownerText || defaultOwnerText(event)
   const confirmText = meta.confirmText || defaultConfirmText(event)
 
   const payload: Record<string, string> = {
     _subject: ownerSubject,
     _template: 'table',
-    message: ownerText,
-    company: event.company,
+    _captcha: 'false',
+    name: participantName,
+    'Name des Teilnehmers': participantName,
     email: event.email,
-    name: 'gfName' in event ? event.gfName : event.name,
+    company: event.company,
+    message: ownerText,
     event: event.event,
     _autoresponse: confirmText,
   }
@@ -250,7 +278,7 @@ function bookingMailto(data: BookingPayload): SubmitResult {
       `Unternehmen: ${data.company}`,
       `Rechtsform: ${data.legalForm}`,
       `USt-IdNr.: ${data.vatId || '—'}`,
-      `Geschäftsführung / Teilnehmer: ${data.gfName}`,
+      `Name des Teilnehmers: ${data.gfName}`,
       `E-Mail: ${data.email}`,
       `Telefon: ${data.phone || '—'}`,
       `Markt: ${data.market}`,
