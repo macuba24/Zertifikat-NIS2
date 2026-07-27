@@ -203,10 +203,32 @@ ol {
 }
 
 .hero__brand {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.hero__logo {
+  display: block;
+  width: auto;
+  height: auto;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.hero__logo--nav {
+  height: 2.75rem;
+  width: auto;
+  max-width: min(52vw, 11.5rem);
+  object-fit: contain;
+  padding: 0.2rem 0.35rem;
+}
+
+.hero__logo--hero {
+  width: min(100%, 22rem);
+  height: auto;
+  padding: 0.65rem 0.85rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
 }
 
 .hero__nav-cta {
@@ -226,13 +248,8 @@ ol {
 }
 
 .hero__brand-mark {
-  font-family: var(--font-display);
-  font-size: clamp(1.85rem, 4.5vw, 2.75rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: var(--text);
-  margin-bottom: var(--space-3);
+  margin: 0 0 var(--space-3);
+  line-height: 0;
 }
 
 .hero__headline {
@@ -660,6 +677,18 @@ ol {
   align-items: flex-end;
 }
 
+.footer__logo {
+  display: block;
+  width: auto;
+  height: 4.25rem;
+  max-width: 12rem;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 4px;
+  padding: 0.35rem 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
 .footer__brand {
   font-family: var(--font-display);
   font-size: 1.25rem;
@@ -747,8 +776,12 @@ ol {
     padding-bottom: 2.5rem;
   }
 
-  .hero__brand-mark {
-    font-size: clamp(1.7rem, 9vw, 2.2rem);
+  .hero__logo--hero {
+    width: min(100%, 16rem);
+  }
+
+  .hero__logo--nav {
+    height: 2.35rem;
   }
 
   .section {

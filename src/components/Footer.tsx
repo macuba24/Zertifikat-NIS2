@@ -23,6 +23,11 @@ export function Footer() {
     <footer className="footer" id="rechtliches">
       <div className="footer__inner">
         <div className="footer__brand-block">
+          <img
+            className="footer__logo"
+            src="/logo-hcq.png"
+            alt="HCQ Coaching and Compliant – Structure | Guidance | Integrity"
+          />
           <p className="footer__brand">{footer.brand}</p>
           <p className="footer__note">{footer.note}</p>
         </div>
