@@ -8,7 +8,7 @@ export const hero = {
   subline:
     'Erfüllen Sie Ihre gesetzliche Pflicht nach § 38 BSIG (DE) bzw. NISG 2026 / § 31 (AT) in nur 3 Stunden – ohne juristisches Blabla.',
   facts: [
-    { label: 'Der Termin', text: 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live via Zoom)' },
+    { label: 'Der Termin', text: 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live via Google Meet)' },
     {
       label: 'Der Nutzen',
       text: 'Rechtssicherer Teilnahmenachweis für Audit & Aufsicht – DE (BSI) und AT (NISG 2026)',
@@ -62,7 +62,7 @@ export const rules = {
     },
     {
       title: 'Die Bedingung',
-      text: 'Zoom-Link und Audit-Testat gibt es erst nach Zahlungseingang (spätestens 1 Woche vor dem Termin). Kein Geld vorab = kein Einlass.',
+      text: 'Google-Meet-Link und Audit-Testat gibt es erst nach Zahlungseingang (spätestens 1 Woche vor dem Termin). Kein Geld vorab = kein Einlass.',
     },
     {
       title: 'Das Testat',
@@ -76,7 +76,7 @@ export const rules = {
 export const cta = {
   id: 'anmeldung',
   title: 'Platz sichern',
-  lead: 'Max. 12 Teilnehmer (DE & AT). Nach Anmeldung: Checkout oder Rechnung. Zoom und Testat erst nach Zahlungseingang.',
+  lead: 'Max. 12 Teilnehmer (DE & AT). Nach Anmeldung: Checkout oder Rechnung. Google Meet und Testat erst nach Zahlungseingang.',
   steps: ['Unternehmen', 'Rechnung', 'Zahlung'],
   submit: 'Verbindlich buchen',
   submitting: 'Wird übermittelt…',
@@ -84,7 +84,7 @@ export const cta = {
   back: 'Zurück',
   successTitle: 'Anmeldung eingegangen',
   successText:
-    'Als Nächstes folgt Checkout oder Rechnung. Zoom-Link erst nach Zahlungseingang; Testat nach Workshop und Freigabe.',
+    'Als Nächstes folgt Checkout oder Rechnung. Google-Meet-Link erst nach Zahlungseingang; Testat nach Workshop und Freigabe.',
   fields: {
     company: 'Unternehmen',
     legalForm: 'Rechtsform',
@@ -139,7 +139,7 @@ export const footer = {
   termsTitle: 'Zahlungs- und Teilnahmebedingungen (Kurzfassung)',
   termsBlocks: [
     '1.000 € zzgl. MwSt./USt. pro Teilnehmer. Max. 12 Teilnehmer. Für DE und AT.',
-    'Zahlung spätestens 1 Woche vor dem Termin. Ohne Zahlungseingang: kein Zoom-Link, kein Einlass, kein Testat.',
+    'Zahlung spätestens 1 Woche vor dem Termin. Ohne Zahlungseingang: kein Google-Meet-Link, kein Einlass, kein Testat.',
     'Testat: fachliche Bestätigung der Unterweisung (§ 38 BSIG / NISG 2026 / CRA) – kein behördliches Siegel.',
     'Übertragbarkeit auf einen Stellvertreter derselben Organisation oder Gutschrift auf den nächsten Termin gemäß Buchungsbestätigung.',
     'Keine individuelle Rechts- oder Steuerberatung.',
