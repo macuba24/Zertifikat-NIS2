@@ -7,7 +7,7 @@
  */
 
 const DEFAULT_TO = 'info@hampacorequality.de'
-const DEFAULT_FROM = 'HCQ Hampa Core Quality <info@hampacorequality.de>'
+const DEFAULT_FROM = 'Audit Ready Lead <info@hampacorequality.de>'
 
 function asString(value, fallback = '') {
   if (typeof value === 'string') return value.trim()
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
   }
 
   const to = asString(process.env.CONTACT_TO_EMAIL || process.env.BOOKING_TO_EMAIL, DEFAULT_TO)
-  const from = asString(process.env.CONTACT_FROM_EMAIL || process.env.BOOKING_FROM_EMAIL, DEFAULT_FROM)
+  const from = asString(process.env.CONTACT_FROM_EMAIL, DEFAULT_FROM)
 
   const ownerText = [
     '=== Website-Anfrage ===',
@@ -144,7 +144,7 @@ export default async function handler(req, res) {
 
   const confirmHtml = `<!doctype html><html><body style="background:#f4f7fb;padding:24px;">
   <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #d7e2ec;padding:24px;">
-    <p style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#1aa3a3;">HCQ Hampa Core Quality</p>
+    <p style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#1aa3a3;">Audit Ready Lead</p>
     ${confirmText
       .split('\n')
       .map(
