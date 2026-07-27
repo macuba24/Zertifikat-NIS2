@@ -48,19 +48,14 @@ export type SubmitResult = {
 
 const contactEmail =
   (import.meta.env.VITE_CONTACT_EMAIL as string | undefined) ||
-  'anmeldung@zertifikatsschulung.de'
+  'info@hampacorequality.de'
 
-function resolveEndpoint(): string {
-  const direct = import.meta.env.VITE_BOOKING_WEBHOOK_URL as string | undefined
-  if (direct) return direct
-  return '/api/booking'
-}
+const BOOKING_ENDPOINT = '/api/booking'
 
 async function postEvent(
   event: BookingEvent | LeadEvent,
   mailtoFallback: () => SubmitResult,
 ): Promise<SubmitResult> {
-  const endpoint = resolveEndpoint()
   const forceMailto = import.meta.env.VITE_FORCE_MAILTO === 'true'
 
   if (forceMailto) {
@@ -68,18 +63,26 @@ async function postEvent(
   }
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(BOOKING_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(event),
     })
 
-    if (response.status === 404 && import.meta.env.DEV) {
+    // Local Vite has no /api — mailto only in development.
+    if (import.meta.env.DEV && (response.status === 404 || response.status === 405)) {
       return mailtoFallback()
     }
 
     if (!response.ok) {
-      throw new Error(`Übermittlung fehlgeschlagen (${response.status})`)
+      let detail = ''
+      try {
+        const json = (await response.json()) as { error?: string }
+        if (json.error) detail = `: ${json.error}`
+      } catch {
+        /* ignore */
+      }
+      throw new Error(`Übermittlung fehlgeschlagen (${response.status})${detail}`)
     }
 
     let checkoutUrl: string | undefined

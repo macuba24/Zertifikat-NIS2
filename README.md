@@ -6,7 +6,7 @@ Landingpage für die **Executive-Pflichtschulung NIS-2 & Cyber Resilience Act (C
 
 ```bash
 npm install
-cp .env.example .env   # optional: Make-Webhook eintragen
+cp .env.example .env   # optional: VITE_FORCE_MAILTO / Kontakt-Mail
 npm run dev
 ```
 
@@ -16,13 +16,11 @@ npm run dev
 npm run build
 ```
 
-Statisches `dist/` auf Vercel deployen. Server-Env: `BOOKING_WEBHOOK_URL` (Make-Webhook). Details: [`docs/AUTOMATION.md`](docs/AUTOMATION.md).
+Statisches `dist/` auf Vercel. Server-Env: `RESEND_API_KEY`, optional `BOOKING_TO_EMAIL`. Details: [`docs/AUTOMATION.md`](docs/AUTOMATION.md).
 
-## Automatisierung (Make.com)
+## Anmeldungen
 
-Kein eigener Server. Flow: Formular → Make → Stripe/Mollie → grüner Haken → Zoom → Testat → Wochenend-Briefing.
-
-Details: [`docs/AUTOMATION.md`](docs/AUTOMATION.md)
+Formular → `/api/booking` → Resend → Postfach (`BOOKING_TO_EMAIL`, Default `info@hampacorequality.de`).
 
 ## Texte
 
