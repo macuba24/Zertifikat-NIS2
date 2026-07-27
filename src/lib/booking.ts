@@ -42,7 +42,7 @@ export type LeadEvent = LeadPayload & {
 }
 
 export type SubmitResult = {
-  mode: 'api' | 'mailto'
+  mode: 'api' | 'formsubmit' | 'mailto'
   checkoutUrl?: string
 }
 
@@ -51,6 +51,126 @@ const contactEmail =
   'info@hampacorequality.de'
 
 const BOOKING_ENDPOINT = '/api/booking'
+const WORKSHOP_WHEN = 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live via Google Meet)'
+
+type FallbackMeta = {
+  to?: string
+  ownerSubject?: string
+  ownerText?: string
+  confirmSubject?: string
+  confirmText?: string
+}
+
+function defaultConfirmText(event: BookingEvent | LeadEvent): string {
+  const name =
+    'gfName' in event && event.gfName
+      ? event.gfName
+      : 'name' in event
+        ? event.name
+        : ''
+  const greeting = name ? `Guten Tag ${name},` : 'Guten Tag,'
+  if (event.event === 'lead.created') {
+    return [
+      greeting,
+      '',
+      'vielen Dank für Ihre Anfrage zur Executive-Pflichtschulung NIS-2, NISG 2026 & CRA.',
+      'Wir haben Ihre Nachricht erhalten und melden uns zeitnah bei Ihnen.',
+      '',
+      `Nächster Termin: ${WORKSHOP_WHEN}`,
+      '',
+      'Mit freundlichen Grüßen',
+      'HCQ Coaching and Compliant',
+      contactEmail,
+    ].join('\n')
+  }
+  return [
+    greeting,
+    '',
+    'vielen Dank – Ihre Anmeldung zur Executive-Pflichtschulung ist bei uns eingegangen.',
+    '',
+    `Termin: ${WORKSHOP_WHEN}`,
+    'Preis: 1.000 € netto zzgl. MwSt.',
+    '',
+    'Als Nächstes erhalten Sie Checkout-Link oder Rechnung.',
+    'Google-Meet-Zugang und Testat folgen erst nach Zahlungseingang',
+    '(spätestens 1 Woche vor dem Termin).',
+    '',
+    'Fragen? Einfach auf diese E-Mail antworten.',
+    '',
+    'Mit freundlichen Grüßen',
+    'HCQ Coaching and Compliant',
+    contactEmail,
+  ].join('\n')
+}
+
+function defaultOwnerText(event: BookingEvent | LeadEvent): string {
+  return JSON.stringify(event, null, 2)
+}
+
+async function postFormSubmit(
+  event: BookingEvent | LeadEvent,
+  meta: FallbackMeta = {},
+): Promise<SubmitResult> {
+  const to = meta.to || contactEmail
+  const ownerSubject =
+    meta.ownerSubject ||
+    (event.event === 'lead.created'
+      ? `Lead Zertifikatsschulung – ${event.company}`
+      : `Buchung Zertifikatsschulung – ${event.company}`)
+  const ownerText = meta.ownerText || defaultOwnerText(event)
+  const confirmText = meta.confirmText || defaultConfirmText(event)
+
+  const payload: Record<string, string> = {
+    _subject: ownerSubject,
+    _template: 'table',
+    message: ownerText,
+    company: event.company,
+    email: event.email,
+    name: 'gfName' in event ? event.gfName : event.name,
+    event: event.event,
+    _autoresponse: confirmText,
+  }
+  if (event.email.includes('@')) {
+    payload._replyto = event.email
+  }
+
+  const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const text = await response.text()
+  let parsed: { success?: string | boolean; message?: string; error?: string } = {}
+  if (text) {
+    try {
+      parsed = JSON.parse(text) as typeof parsed
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const ok =
+    response.ok &&
+    (parsed.success === true ||
+      parsed.success === 'true' ||
+      String(parsed.message || '')
+        .toLowerCase()
+        .includes('success'))
+
+  if (!ok) {
+    throw new Error(
+      parsed.error ||
+        parsed.message ||
+        `FormSubmit fehlgeschlagen (${response.status})`,
+    )
+  }
+
+  return { mode: 'formsubmit' }
+}
 
 async function postEvent(
   event: BookingEvent | LeadEvent,
@@ -62,6 +182,8 @@ async function postEvent(
     return mailtoFallback()
   }
 
+  let fallbackMeta: FallbackMeta = {}
+
   try {
     const response = await fetch(BOOKING_ENDPOINT, {
       method: 'POST',
@@ -69,35 +191,52 @@ async function postEvent(
       body: JSON.stringify(event),
     })
 
-    // Local Vite has no /api — mailto only in development.
     if (import.meta.env.DEV && (response.status === 404 || response.status === 405)) {
-      return mailtoFallback()
+      return await postFormSubmit(event).catch(() => mailtoFallback())
     }
 
-    if (!response.ok) {
-      let detail = ''
+    const contentType = response.headers.get('content-type') ?? ''
+    let json: Record<string, unknown> = {}
+    if (contentType.includes('application/json')) {
       try {
-        const json = (await response.json()) as { error?: string; hint?: string }
-        if (json.error) detail = `: ${json.error}`
-        else if (json.hint) detail = `: ${json.hint}`
+        json = (await response.json()) as Record<string, unknown>
       } catch {
         /* ignore */
       }
-      throw new Error(`Übermittlung fehlgeschlagen (${response.status})${detail}`)
     }
 
-    let checkoutUrl: string | undefined
-    const contentType = response.headers.get('content-type') ?? ''
-    if (contentType.includes('application/json')) {
-      const json = (await response.json()) as { checkoutUrl?: string }
-      if (json.checkoutUrl) checkoutUrl = json.checkoutUrl
+    if (response.ok) {
+      return {
+        mode: 'api',
+        checkoutUrl: typeof json.checkoutUrl === 'string' ? json.checkoutUrl : undefined,
+      }
     }
 
-    return { mode: 'api', checkoutUrl }
+    if (json.clientFallback) {
+      fallbackMeta = {
+        to: typeof json.to === 'string' ? json.to : contactEmail,
+        ownerSubject: typeof json.ownerSubject === 'string' ? json.ownerSubject : undefined,
+        ownerText: typeof json.ownerText === 'string' ? json.ownerText : undefined,
+        confirmSubject:
+          typeof json.confirmSubject === 'string' ? json.confirmSubject : undefined,
+        confirmText: typeof json.confirmText === 'string' ? json.confirmText : undefined,
+      }
+      return await postFormSubmit(event, fallbackMeta)
+    }
+
+    throw new Error(
+      typeof json.error === 'string'
+        ? `Übermittlung fehlgeschlagen: ${json.error}`
+        : `Übermittlung fehlgeschlagen (${response.status})`,
+    )
   } catch (error) {
-    // Safety net: never lose a lead if the API path fails.
-    console.error('booking api failed, mailto fallback', error)
-    return mailtoFallback()
+    console.error('booking primary path failed, trying FormSubmit', error)
+    try {
+      return await postFormSubmit(event, fallbackMeta)
+    } catch (fallbackError) {
+      console.error('formsubmit failed, mailto fallback', fallbackError)
+      return mailtoFallback()
+    }
   }
 }
 

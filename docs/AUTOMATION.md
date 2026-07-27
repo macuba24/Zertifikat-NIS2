@@ -19,7 +19,7 @@ flowchart LR
 | `VITE_CONTACT_EMAIL` | nein | Mailto-Fallback |
 | `VITE_FORCE_MAILTO=true` | nein | Lokal: nur Mailto |
 
-\*Ohne `RESEND_API_KEY` nutzt die Function automatisch **FormSubmit** an `BOOKING_TO_EMAIL`. Beim ersten Mal ggf. Aktivierungslink in der Mail an dieses Postfach bestätigen.
+\*Ohne `RESEND_API_KEY` antwortet die API mit `clientFallback: true`. Der Browser sendet dann per **FormSubmit** an `BOOKING_TO_EMAIL` (inkl. Autoresponse an den Anmelder). Beim allerersten Mal ggf. Aktivierungslink in der Mail an `info@hampacorequality.de` bestätigen.
 
 ### Vercel einrichten
 
