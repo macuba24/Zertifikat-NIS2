@@ -8,7 +8,7 @@ export const hero = {
   subline:
     'Erfüllen Sie Ihre gesetzliche Pflicht nach § 38 BSIG (DE) bzw. NISG 2026 / § 31 (AT) in nur 3 Stunden – ohne juristisches Blabla.',
   facts: [
-    { label: 'Der Termin', text: 'Nächsten Samstag, 09:00 – 12:00 Uhr (Live via Zoom)' },
+    { label: 'Der Termin', text: 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live via Zoom)' },
     {
       label: 'Der Nutzen',
       text: 'Rechtssicherer Teilnahmenachweis für Audit & Aufsicht – DE (BSI) und AT (NISG 2026)',
