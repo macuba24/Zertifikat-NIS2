@@ -1,17 +1,18 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
+/**
+ * Landingpage → Resend → Postfach (BOOKING_TO_EMAIL).
+ * Plain JS for reliable Vercel Node runtime (package.json type=module).
+ */
 
 const DEFAULT_TO = 'info@hampacorequality.de'
 const DEFAULT_FROM = 'HCQ Zertifikatsschulung <onboarding@resend.dev>'
 
-type BookingBody = Record<string, unknown>
-
-function asString(value: unknown, fallback = '—'): string {
+function asString(value, fallback = '—') {
   if (typeof value === 'string' && value.trim()) return value.trim()
   if (typeof value === 'number') return String(value)
   return fallback
 }
 
-function buildSubject(body: BookingBody): string {
+function buildSubject(body) {
   const event = asString(body.event, 'booking.created')
   const company = asString(body.company, 'Unbekannt')
   if (event === 'lead.created') {
@@ -20,7 +21,7 @@ function buildSubject(body: BookingBody): string {
   return `Buchung Zertifikatsschulung – ${company}`
 }
 
-function buildText(body: BookingBody): string {
+function buildText(body) {
   const event = asString(body.event, 'booking.created')
 
   if (event === 'lead.created') {
@@ -71,10 +72,7 @@ function buildText(body: BookingBody): string {
   ].join('\n')
 }
 
-/**
- * Landingpage → Resend → Postfach (BOOKING_TO_EMAIL).
- */
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.status(204).end()
     return
@@ -93,11 +91,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const to = process.env.BOOKING_TO_EMAIL?.trim() || DEFAULT_TO
   const from = process.env.BOOKING_FROM_EMAIL?.trim() || DEFAULT_FROM
-  const body = (req.body ?? {}) as BookingBody
+  const body = req.body ?? {}
   const replyTo = asString(body.email, '')
 
   try {
-    const payload: Record<string, unknown> = {
+    const payload = {
       from,
       to: [to],
       subject: buildSubject(body),
@@ -117,10 +115,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
 
     const text = await upstream.text()
-    let parsed: Record<string, unknown> = {}
+    let parsed = {}
     if (text) {
       try {
-        parsed = JSON.parse(text) as Record<string, unknown>
+        parsed = JSON.parse(text)
       } catch {
         parsed = { raw: text }
       }
