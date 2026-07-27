@@ -32,24 +32,12 @@ flowchart LR
 
 ## Payload
 
-Die Landingpage POSTet JSON auf **`/api/booking`**:
+Die Landingpage POSTet JSON auf **`/api/booking`**. Die Function sendet:
 
-```json
-{
-  "event": "booking.created",
-  "status": "pending_payment",
-  "product": "nis2-nisg2026-cra-executive-workshop",
-  "priceNetEur": 1000,
-  "currency": "EUR",
-  "company": "Muster GmbH",
-  "gfName": "Max Mustermann",
-  "email": "max@muster.de",
-  "paymentMethod": "Kreditkarte",
-  "createdAt": "2026-07-22T12:00:00.000Z"
-}
-```
+1. **interne Mail** an `BOOKING_TO_EMAIL` (dein Postfach)
+2. **Bestätigungsmail** an die E-Mail-Adresse des Anmelders (Buchung oder Lead)
 
-Antwort bei Erfolg: `{ "ok": true, "id": "…" }` (Resend Message-ID).
+Antwort bei Erfolg: `{ "ok": true, "id": "…", "confirmationId": "…" }`.
 
 Lokal (`npm run dev`) gibt es keine Vercel-Function — dann Mailto-Fallback an `VITE_CONTACT_EMAIL`.
 

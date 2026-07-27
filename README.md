@@ -20,7 +20,7 @@ Statisches `dist/` auf Vercel. Server-Env: `RESEND_API_KEY`, optional `BOOKING_T
 
 ## Anmeldungen
 
-Formular → `/api/booking` → Resend → Postfach (`BOOKING_TO_EMAIL`, Default `info@hampacorequality.de`).
+Formular → `/api/booking` → Resend → dein Postfach **plus** Bestätigungsmail an den Anmelder.
 
 ## Texte
 

@@ -84,7 +84,7 @@ export const cta = {
   back: 'Zurück',
   successTitle: 'Anmeldung eingegangen',
   successText:
-    'Als Nächstes folgt Checkout oder Rechnung. Google-Meet-Link erst nach Zahlungseingang; Testat nach Workshop und Freigabe.',
+    'Wir haben Ihre Anmeldung erhalten und eine Bestätigung an Ihre E-Mail gesendet. Als Nächstes folgt Checkout oder Rechnung. Google-Meet-Link erst nach Zahlungseingang; Testat nach Workshop und Freigabe.',
   fields: {
     company: 'Unternehmen',
     legalForm: 'Rechtsform',
