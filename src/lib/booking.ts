@@ -77,8 +77,9 @@ async function postEvent(
     if (!response.ok) {
       let detail = ''
       try {
-        const json = (await response.json()) as { error?: string }
+        const json = (await response.json()) as { error?: string; hint?: string }
         if (json.error) detail = `: ${json.error}`
+        else if (json.hint) detail = `: ${json.hint}`
       } catch {
         /* ignore */
       }
@@ -94,10 +95,9 @@ async function postEvent(
 
     return { mode: 'api', checkoutUrl }
   } catch (error) {
-    if (import.meta.env.DEV) {
-      return mailtoFallback()
-    }
-    throw error
+    // Safety net: never lose a lead if the API path fails.
+    console.error('booking api failed, mailto fallback', error)
+    return mailtoFallback()
   }
 }
 

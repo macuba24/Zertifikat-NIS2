@@ -13,11 +13,13 @@ flowchart LR
 
 | Variable | Pflicht | Zweck |
 | --- | --- | --- |
-| `RESEND_API_KEY` | ja | API-Key von [resend.com](https://resend.com) |
+| `RESEND_API_KEY` | nein* | API-Key von [resend.com](https://resend.com) — empfohlen |
 | `BOOKING_TO_EMAIL` | nein | Empfänger (Default: `info@hampacorequality.de`) |
-| `BOOKING_FROM_EMAIL` | nein | Absender; Default Resend-Onboarding `onboarding@resend.dev` |
-| `VITE_CONTACT_EMAIL` | nein | Mailto-Fallback nur lokal |
-| `VITE_FORCE_MAILTO=true` | nein | Lokal: Formular nur per Mailto testen |
+| `BOOKING_FROM_EMAIL` | nein | Absender bei Resend |
+| `VITE_CONTACT_EMAIL` | nein | Mailto-Fallback |
+| `VITE_FORCE_MAILTO=true` | nein | Lokal: nur Mailto |
+
+\*Ohne `RESEND_API_KEY` nutzt die Function automatisch **FormSubmit** an `BOOKING_TO_EMAIL`. Beim ersten Mal ggf. Aktivierungslink in der Mail an dieses Postfach bestätigen.
 
 ### Vercel einrichten
 
