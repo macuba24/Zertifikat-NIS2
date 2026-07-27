@@ -127,8 +127,10 @@ export default async function handler(req, res) {
   const confirmText = [
     greeting,
     '',
-    'vielen Dank für Ihre Anfrage an Hampa Core Quality.',
+    'vielen Dank für Ihre Anfrage an Audit Ready Lead / Hampa Core Quality.',
     'Wir haben Ihre Nachricht erhalten und melden uns innerhalb von 24 Stunden.',
+    '',
+    'Falls Sie diese Mail nicht erwartet haben, antworten Sie einfach kurz oder ignorieren Sie sie.',
     '',
     `Unternehmen: ${company}`,
     `Telefon: ${phone}`,
@@ -158,7 +160,8 @@ export default async function handler(req, res) {
   const confirmation = await sendResend(apiKey, {
     from,
     to: [email],
-    subject: 'Ihre Anfrage – Hampa Core Quality',
+    reply_to: to,
+    subject: 'Audit Ready Lead – wir haben Ihre Anfrage erhalten',
     text: confirmText,
     html: confirmHtml,
   })
