@@ -44,7 +44,8 @@ export type LeadEvent = LeadPayload & {
 export type SubmitResult = {
   mode: 'api' | 'formsubmit' | 'mailto'
   checkoutUrl?: string
-  /** Confirmation text shown on-page / used for mailto to applicant */
+  confirmationEmailSent?: boolean
+  /** Confirmation text shown on-page */
   confirmation?: {
     subject: string
     text: string
@@ -90,15 +91,6 @@ export function buildBookingConfirmation(data: BookingPayload): {
     contactEmail,
   ].join('\n')
   return { subject, text, to: data.email }
-}
-
-export function openConfirmationMailto(confirmation: {
-  subject: string
-  text: string
-  to: string
-}): void {
-  const href = `mailto:${encodeURIComponent(confirmation.to)}?subject=${encodeURIComponent(confirmation.subject)}&body=${encodeURIComponent(confirmation.text)}&bcc=${encodeURIComponent(contactEmail)}`
-  window.location.href = href
 }
 
 type FallbackMeta = {
@@ -239,14 +231,18 @@ async function postFormSubmit(
     )
   }
 
-  // FormSubmit-Autoresponse ist unzuverlässig — Bestätigung separat per mailto an Teilnehmer.
+  // FormSubmit liefert nur an HCQ; Bestätigung an Teilnehmer braucht Resend.
   if (event.event === 'booking.created' && event.email.includes('@')) {
-    const confirmation = buildBookingConfirmation(event)
-    return { mode: 'formsubmit', confirmation }
+    return {
+      mode: 'formsubmit',
+      confirmationEmailSent: false,
+      confirmation: buildBookingConfirmation(event),
+    }
   }
 
   return {
     mode: 'formsubmit',
+    confirmationEmailSent: false,
     confirmation:
       event.event === 'lead.created'
         ? {
@@ -305,6 +301,7 @@ async function postEvent(
       return {
         mode: 'api',
         checkoutUrl: typeof json.checkoutUrl === 'string' ? json.checkoutUrl : undefined,
+        confirmationEmailSent: Boolean(json.confirmationId) && !json.confirmationError,
         confirmation,
       }
     }
@@ -368,7 +365,7 @@ function bookingMailto(data: BookingPayload): SubmitResult {
   )
   // Anfrage an HCQ + Bestätigung an Teilnehmer (BCC an HCQ).
   window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}&cc=${encodeURIComponent(data.email)}`
-  return { mode: 'mailto', confirmation }
+  return { mode: 'mailto', confirmationEmailSent: false, confirmation }
 }
 
 function leadMailto(data: LeadPayload): SubmitResult {

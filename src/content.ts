@@ -83,8 +83,10 @@ export const cta = {
   next: 'Weiter',
   back: 'Zurück',
   successTitle: 'Anmeldung eingegangen',
-  successText:
-    'Anmeldung ist gespeichert. Unten sehen Sie Ihre Buchungsbestätigung. Zusätzlich öffnet sich Ihr E-Mail-Programm mit der Bestätigung an Ihre Adresse — bitte absenden, dann liegt sie in Ihrem Postfach.',
+  successTextEmailSent:
+    'Wir haben Ihre Anmeldung erhalten und eine Bestätigungsmail an Ihre E-Mail-Adresse gesendet (bitte auch Spam prüfen). Google-Meet-Link und Testat folgen nach Zahlungseingang.',
+  successTextOnPageOnly:
+    'Wir haben Ihre Anmeldung erhalten. Ihre Buchungsbestätigung steht unten — bitte speichern oder ausdrucken. Die automatische Bestätigungsmail wird aktiviert, sobald der E-Mail-Versand eingerichtet ist.',
   fields: {
     company: 'Unternehmen',
     legalForm: 'Rechtsform',

@@ -16,7 +16,7 @@ npm run dev
 npm run build
 ```
 
-Statisches `dist/` auf Vercel. Server-Env: `RESEND_API_KEY`, optional `BOOKING_TO_EMAIL`. Details: [`docs/AUTOMATION.md`](docs/AUTOMATION.md).
+Statisches `dist/` auf Vercel. Für Bestätigungsmail an Anmelder: `RESEND_API_KEY` setzen — siehe [`docs/RESEND-SETUP.md`](docs/RESEND-SETUP.md).
 
 ## Anmeldungen
 

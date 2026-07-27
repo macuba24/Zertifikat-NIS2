@@ -2,7 +2,6 @@ import { useState, type FormEvent } from 'react'
 import { cta } from '../content'
 import {
   buildBookingConfirmation,
-  openConfirmationMailto,
   submitBooking,
   type BookingPayload,
 } from '../lib/booking'
@@ -38,6 +37,7 @@ export function CtaForm() {
   const [confirmation, setConfirmation] = useState<ReturnType<
     typeof buildBookingConfirmation
   > | null>(null)
+  const [emailSent, setEmailSent] = useState(false)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -60,11 +60,7 @@ export function CtaForm() {
 
       const conf = result.confirmation ?? buildBookingConfirmation(payload)
       setConfirmation(conf)
-
-      // Bestätigung zuverlässig an Teilnehmer: Mail-Client mit fertiger Bestätigung öffnen.
-      // Absenden legt die Bestätigung im eigenen Postfach ab (und BCC an HCQ).
-      window.setTimeout(() => openConfirmationMailto(conf), 400)
-
+      setEmailSent(Boolean(result.confirmationEmailSent))
       setState('success')
       setStep(0)
       form.reset()
@@ -92,18 +88,15 @@ export function CtaForm() {
         {state === 'success' ? (
           <div className="form-success" role="status">
             <h3 className="form-success__title">{cta.successTitle}</h3>
-            <p className="form-success__text">{cta.successText}</p>
+            <p className="form-success__text">
+              {emailSent
+                ? cta.successTextEmailSent
+                : cta.successTextOnPageOnly}
+            </p>
             {confirmation && (
               <div className="form-success__receipt">
                 <h4 className="form-success__receipt-title">Ihre Buchungsbestätigung</h4>
                 <pre className="form-success__receipt-body">{confirmation.text}</pre>
-                <button
-                  type="button"
-                  className="btn btn--primary"
-                  onClick={() => openConfirmationMailto(confirmation)}
-                >
-                  Bestätigung per E-Mail öffnen
-                </button>
               </div>
             )}
             <button
@@ -112,6 +105,7 @@ export function CtaForm() {
               onClick={() => {
                 setState('idle')
                 setConfirmation(null)
+                setEmailSent(false)
               }}
             >
               Weitere Buchung
