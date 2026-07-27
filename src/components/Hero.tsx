@@ -13,10 +13,10 @@ export function Hero() {
           {hero.primaryCta}
         </a>
       </nav>
+      <div className="hero__brand-banner reveal reveal--1">
+        <img className="hero__logo hero__logo--hero" src={LOGO_SRC} alt={LOGO_ALT} />
+      </div>
       <div className="hero__content">
-        <p className="hero__brand-mark reveal reveal--1">
-          <img className="hero__logo hero__logo--hero" src={LOGO_SRC} alt={LOGO_ALT} />
-        </p>
         <h1 className="hero__headline reveal reveal--2">{hero.headline}</h1>
         <p className="hero__subline reveal reveal--3">{hero.subline}</p>
         <ul className="hero__facts reveal reveal--4">
