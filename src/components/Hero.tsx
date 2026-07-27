@@ -9,9 +9,6 @@ export function Hero() {
       <div className="hero__backdrop" aria-hidden="true" />
       <div className="hero__grain" aria-hidden="true" />
       <nav className="hero__nav">
-        <a className="hero__brand" href="#top">
-          <img className="hero__logo hero__logo--nav" src={LOGO_SRC} alt={LOGO_ALT} />
-        </a>
         <a className="hero__nav-cta" href="#anmeldung">
           {hero.primaryCta}
         </a>
