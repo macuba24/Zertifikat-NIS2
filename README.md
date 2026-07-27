@@ -1,14 +1,16 @@
 # Zertifikatsschulung
 
-Landingpage für die **Executive-Pflichtschulung NIS-2 & Cyber Resilience Act (CRA)** – rechtssicherer Haftungsschutz für Geschäftsführer und leitende Angestellte.
+Landingpage für die **Executive-Pflichtschulung NIS-2 & Cyber Resilience Act (CRA)**.
 
 ## Entwicklung
 
 ```bash
 npm install
-cp .env.example .env   # optional: VITE_FORCE_MAILTO / Kontakt-Mail
+cp .env.example .env
 npm run dev
 ```
+
+API-Mails lokal testen: `npx vercel dev` (mit `RESEND_API_KEY` in `.env`).
 
 ## Build / Vercel
 
@@ -16,16 +18,15 @@ npm run dev
 npm run build
 ```
 
-Statisches `dist/` auf Vercel. Für Bestätigungsmail an Anmelder: `RESEND_API_KEY` setzen — siehe [`docs/RESEND-SETUP.md`](docs/RESEND-SETUP.md).
+**Pflicht für Bestätigungsmails:** `RESEND_API_KEY` in Vercel — Anleitung [`docs/RESEND-SETUP.md`](docs/RESEND-SETUP.md).
 
 ## Anmeldungen
 
-Formular → `/api/booking` → Resend → dein Postfach **plus** Bestätigungsmail an den Anmelder.
+Formular → `/api/booking` → Resend:
+
+1. Mail an `info@hampacorequality.de`
+2. Bestätigungsmail an den Anmelder
 
 ## Texte
 
-Marketing-Copy: [`src/content.ts`](src/content.ts)
-
-## Rechtliches vor Go-Live
-
-Impressum, Datenschutz und AGB-Platzhalter im Footer durch echte Angaben ersetzen.
+[`src/content.ts`](src/content.ts)

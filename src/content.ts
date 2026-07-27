@@ -84,9 +84,9 @@ export const cta = {
   back: 'Zurück',
   successTitle: 'Anmeldung eingegangen',
   successTextEmailSent:
-    'Wir haben Ihre Anmeldung erhalten und eine Bestätigungsmail an Ihre E-Mail-Adresse gesendet (bitte auch Spam prüfen). Google-Meet-Link und Testat folgen nach Zahlungseingang.',
+    'Wir haben Ihre Anmeldung erhalten und eine Bestätigungsmail an Ihre E-Mail-Adresse gesendet (bitte auch den Spam-Ordner prüfen). Google-Meet-Link und Testat folgen nach Zahlungseingang.',
   successTextOnPageOnly:
-    'Wir haben Ihre Anmeldung erhalten. Ihre Buchungsbestätigung steht unten — bitte speichern oder ausdrucken. Die automatische Bestätigungsmail wird aktiviert, sobald der E-Mail-Versand eingerichtet ist.',
+    'Wir haben Ihre Anmeldung erhalten. Unten steht Ihre Buchungsbestätigung zum Speichern. Die Bestätigungsmail konnte nicht zugestellt werden — bitte kontaktieren Sie uns unter info@hampacorequality.de.',
   fields: {
     company: 'Unternehmen',
     legalForm: 'Rechtsform',

@@ -1,6 +1,9 @@
 /**
- * Landingpage → Resend → Postfach + Bestätigung.
- * Ohne RESEND_API_KEY: 503 mit clientFallback (Browser übernimmt FormSubmit).
+ * Robuster Buchungsversand: nur Resend.
+ * 1) Mail an HCQ (BOOKING_TO_EMAIL)
+ * 2) Bestätigungsmail an Anmelder
+ *
+ * Pflicht: RESEND_API_KEY in Vercel.
  */
 
 const DEFAULT_TO = 'info@hampacorequality.de'
@@ -17,30 +20,34 @@ function isEmail(value) {
   return typeof value === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
 }
 
+function escapeHtml(value) {
+  return asString(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+}
+
 function buildOwnerSubject(body) {
   const event = asString(body.event, 'booking.created')
-  const company = asString(body.company, 'Unbekannt')
+  const participant = asString(body.gfName || body.name, 'Unbekannt')
+  const company = asString(body.company, '—')
   if (event === 'lead.created') {
-    return `Lead Zertifikatsschulung – ${company}`
+    return `Lead Zertifikatsschulung – ${participant} / ${company}`
   }
-  return `Buchung Zertifikatsschulung – ${company}`
+  return `Buchung Zertifikatsschulung – ${participant} / ${company}`
 }
 
 function buildOwnerText(body) {
   const event = asString(body.event, 'booking.created')
-
   if (event === 'lead.created') {
     return [
       '=== Lead Zertifikatsschulung ===',
-      `Name: ${asString(body.name)}`,
       `Name des Teilnehmers: ${asString(body.name)}`,
       `Unternehmen: ${asString(body.company)}`,
       `E-Mail: ${asString(body.email)}`,
       `Telefon: ${asString(body.phone)}`,
       `Markt: ${asString(body.market)}`,
-      `Status: ${asString(body.status, 'new_lead')}`,
-      `Produkt: ${asString(body.product)}`,
-      `Quelle: ${asString(body.source)}`,
       `Zeitpunkt: ${asString(body.createdAt)}`,
     ].join('\n')
   }
@@ -49,7 +56,7 @@ function buildOwnerText(body) {
   const billing = billingSame
     ? 'Entspricht Unternehmenssitz'
     : [
-        `Straße: ${asString(body.street)}`,
+        `Strasse: ${asString(body.street)}`,
         `PLZ/Ort: ${asString(body.zip)} ${asString(body.city)}`,
         `Land: ${asString(body.country)}`,
       ].join('\n')
@@ -69,34 +76,31 @@ function buildOwnerText(body) {
     '',
     `Zahlungsart: ${asString(body.paymentMethod)}`,
     `Bemerkung: ${asString(body.notes)}`,
-    '',
     `Status: ${asString(body.status, 'pending_payment')}`,
     `Preis: ${asString(body.priceNetEur, '1000')} ${asString(body.currency, 'EUR')} netto`,
-    `Produkt: ${asString(body.product)}`,
-    `Quelle: ${asString(body.source)}`,
+    `Termin: ${WORKSHOP_WHEN}`,
     `Zeitpunkt: ${asString(body.createdAt)}`,
   ].join('\n')
 }
 
 function buildConfirmSubject(body) {
-  const event = asString(body.event, 'booking.created')
-  if (event === 'lead.created') {
+  if (asString(body.event) === 'lead.created') {
     return 'Ihre Anfrage – Zertifikatsschulung NIS-2 / NISG 2026 / CRA'
   }
-  return 'Anmeldung eingegangen – Zertifikatsschulung NIS-2 / NISG 2026 / CRA'
+  return 'Buchungsbestätigung – Zertifikatsschulung NIS-2 / NISG 2026 / CRA'
 }
 
 function buildConfirmText(body) {
-  const event = asString(body.event, 'booking.created')
   const name = asString(body.gfName || body.name, '')
   const greeting = name && name !== '—' ? `Guten Tag ${name},` : 'Guten Tag,'
+  const event = asString(body.event, 'booking.created')
 
   if (event === 'lead.created') {
     return [
       greeting,
       '',
       'vielen Dank für Ihre Anfrage zur Executive-Pflichtschulung NIS-2, NISG 2026 & CRA.',
-      'Wir haben Ihre Nachricht erhalten und melden uns zeitnah bei Ihnen.',
+      'Wir haben Ihre Nachricht erhalten und melden uns zeitnah.',
       '',
       `Nächster Termin: ${WORKSHOP_WHEN}`,
       '',
@@ -110,7 +114,13 @@ function buildConfirmText(body) {
   return [
     greeting,
     '',
-    'vielen Dank – Ihre Anmeldung zur Executive-Pflichtschulung ist bei uns eingegangen.',
+    'hiermit bestätigen wir Ihre Anmeldung zur Executive-Pflichtschulung.',
+    '',
+    `Teilnehmer: ${asString(body.gfName)}`,
+    `Unternehmen: ${asString(body.company)}`,
+    `E-Mail: ${asString(body.email)}`,
+    `Markt: ${asString(body.market)}`,
+    `Zahlungsart: ${asString(body.paymentMethod)}`,
     '',
     `Termin: ${WORKSHOP_WHEN}`,
     'Preis: 1.000 € netto zzgl. MwSt.',
@@ -119,8 +129,6 @@ function buildConfirmText(body) {
     'Google-Meet-Zugang und Testat folgen erst nach Zahlungseingang',
     '(spätestens 1 Woche vor dem Termin).',
     '',
-    'Fragen? Einfach auf diese E-Mail antworten.',
-    '',
     'Mit freundlichen Grüßen',
     'HCQ Coaching and Compliant',
     'Rainer Hampicke',
@@ -128,7 +136,21 @@ function buildConfirmText(body) {
   ].join('\n')
 }
 
-async function sendResend(apiKey, payload) {
+function buildConfirmHtml(body) {
+  const text = buildConfirmText(body)
+  const rows = text
+    .split('\n')
+    .map((line) => `<p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:15px;line-height:1.5;color:#12283c;">${escapeHtml(line) || '&nbsp;'}</p>`)
+    .join('')
+  return `<!doctype html><html><body style="background:#f4f7fb;padding:24px;">
+  <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #d7e2ec;padding:24px;">
+    <p style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#1aa3a3;">HCQ Coaching and Compliant</p>
+    ${rows}
+  </div>
+</body></html>`
+}
+
+async function sendResend(apiKey, payload, attempt = 1) {
   const upstream = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -138,14 +160,19 @@ async function sendResend(apiKey, payload) {
     body: JSON.stringify(payload),
   })
 
-  const text = await upstream.text()
+  const raw = await upstream.text()
   let parsed = {}
-  if (text) {
+  if (raw) {
     try {
-      parsed = JSON.parse(text)
+      parsed = JSON.parse(raw)
     } catch {
-      parsed = { raw: text }
+      parsed = { raw }
     }
+  }
+
+  if (!upstream.ok && attempt < 2 && upstream.status >= 500) {
+    await new Promise((r) => setTimeout(r, 400))
+    return sendResend(apiKey, payload, attempt + 1)
   }
 
   return { ok: upstream.ok, status: upstream.status, parsed }
@@ -163,79 +190,75 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.RESEND_API_KEY?.trim()
+  if (!apiKey) {
+    res.status(503).json({
+      error: 'E-Mail-Versand ist nicht konfiguriert (RESEND_API_KEY fehlt in Vercel).',
+      code: 'RESEND_NOT_CONFIGURED',
+      setup: 'https://resend.com → API Key → Vercel Environment Variable RESEND_API_KEY → Redeploy',
+    })
+    return
+  }
+
   const to = process.env.BOOKING_TO_EMAIL?.trim() || DEFAULT_TO
   const from = process.env.BOOKING_FROM_EMAIL?.trim() || DEFAULT_FROM
   const body = req.body ?? {}
   const applicantEmail = asString(body.email, '')
 
-  // Without Resend: tell the browser to deliver via FormSubmit (server IPs are blocked).
-  if (!apiKey) {
-    res.status(503).json({
-      error: 'RESEND_API_KEY is not configured',
-      clientFallback: true,
-      to,
-      confirmSubject: buildConfirmSubject(body),
-      confirmText: buildConfirmText(body),
-      ownerSubject: buildOwnerSubject(body),
-      ownerText: buildOwnerText(body),
-    })
+  if (!isEmail(applicantEmail)) {
+    res.status(400).json({ error: 'Gültige E-Mail-Adresse des Anmelders ist erforderlich.' })
     return
   }
 
   try {
-    const ownerPayload = {
+    const owner = await sendResend(apiKey, {
       from,
       to: [to],
+      reply_to: applicantEmail,
       subject: buildOwnerSubject(body),
       text: buildOwnerText(body),
-    }
-    if (isEmail(applicantEmail)) {
-      ownerPayload.reply_to = applicantEmail
-    }
+    })
 
-    const owner = await sendResend(apiKey, ownerPayload)
     if (!owner.ok) {
       res.status(502).json({
-        error: 'Resend email failed',
+        error: 'Benachrichtigung an HCQ fehlgeschlagen.',
+        code: 'OWNER_MAIL_FAILED',
         status: owner.status,
-        clientFallback: true,
-        to,
-        ...owner.parsed,
+        detail: owner.parsed,
       })
       return
     }
 
-    let confirmationId = null
-    let confirmationError = null
+    const confirm = await sendResend(apiKey, {
+      from,
+      to: [applicantEmail],
+      reply_to: to,
+      subject: buildConfirmSubject(body),
+      text: buildConfirmText(body),
+      html: buildConfirmHtml(body),
+    })
 
-    if (isEmail(applicantEmail)) {
-      const confirm = await sendResend(apiKey, {
-        from,
-        to: [applicantEmail.trim()],
-        reply_to: to,
-        subject: buildConfirmSubject(body),
-        text: buildConfirmText(body),
+    if (!confirm.ok) {
+      res.status(502).json({
+        error: 'Bestätigungsmail an Anmelder fehlgeschlagen.',
+        code: 'CONFIRM_MAIL_FAILED',
+        status: confirm.status,
+        ownerId: owner.parsed.id ?? null,
+        detail: confirm.parsed,
       })
-      if (confirm.ok) {
-        confirmationId = confirm.parsed.id ?? null
-      } else {
-        confirmationError =
-          confirm.parsed.error || confirm.parsed.message || 'confirmation failed'
-      }
+      return
     }
 
     res.status(200).json({
       ok: true,
       provider: 'resend',
-      id: owner.parsed.id ?? null,
-      confirmationId,
-      confirmationError,
+      ownerId: owner.parsed.id ?? null,
+      confirmationId: confirm.parsed.id ?? null,
+      confirmationEmailSent: true,
     })
   } catch (error) {
     res.status(502).json({
-      error: error instanceof Error ? error.message : 'Email send failed',
-      clientFallback: true,
-      to,
+      error: error instanceof Error ? error.message : 'E-Mail-Versand fehlgeschlagen',
+      code: 'MAIL_EXCEPTION',
     })
   }
 }

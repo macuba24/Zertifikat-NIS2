@@ -1,31 +1,59 @@
-# Resend einrichten (Bestätigungsmail an Anmelder)
+# Robuster E-Mail-Versand (Resend)
 
-Damit die Buchungsbestätigung **automatisch im Postfach des Anmelders** landet:
+Anmeldung und Bestätigung laufen **nur über Resend** — kein FormSubmit, kein Mailto.
 
-## 1. Account
+```mermaid
+flowchart LR
+  Form[Landingpage] --> Api["/api/booking"]
+  Api --> Owner[Mail an info@hampacorequality.de]
+  Api --> Confirm[Bestätigung an Anmelder]
+```
 
-1. https://resend.com öffnen → Sign up (kostenlos)
-2. **API Keys** → Create API Key → Key kopieren (`re_…`)
+## Pflicht-Setup (einmalig, ca. 3 Minuten)
 
-## 2. Vercel
+### 1. Resend-Account
 
-1. https://vercel.com → Projekt **Zertifikat-NIS2** (oder euer Deploy)
+1. Öffne https://resend.com und registriere dich (kostenlos)
+2. **API Keys** → Create → Key kopieren (`re_…`)
+
+### 2. Vercel Environment Variable
+
+1. https://vercel.com → Projekt der Landingpage
 2. **Settings → Environment Variables**
-3. Neu:
-   - Name: `RESEND_API_KEY`
-   - Value: `re_…`
-   - Environments: Production (+ Preview)
-4. Optional:
-   - `BOOKING_TO_EMAIL` = `info@hampacorequality.de`
-   - `BOOKING_FROM_EMAIL` = `HCQ Zertifikatsschulung <onboarding@resend.dev>`  
-     (oder nach Domain-Verifizierung z. B. `anmeldung@hampacorequality.de`)
+3. Anlegen:
 
-## 3. Redeploy
+| Name | Wert | Environments |
+| --- | --- | --- |
+| `RESEND_API_KEY` | `re_…` | Production, Preview |
+| `BOOKING_TO_EMAIL` | `info@hampacorequality.de` | Production, Preview (optional) |
+| `BOOKING_FROM_EMAIL` | zuerst: `HCQ Zertifikatsschulung <onboarding@resend.dev>` | Production, Preview (optional) |
 
-Deployments → **Redeploy** (ohne Cache), damit die Function den Key sieht.
+4. **Deployments → Redeploy** (ohne Cache)
 
-## 4. Test
+### 3. Test
 
-Buchung mit eigener E-Mail absenden → Bestätigung sollte im Posteingang (und ggf. Spam) liegen.
+Buchung mit einer echten E-Mail absenden:
 
-> Mit Absender `onboarding@resend.dev` kann Resend anfangs nur an die **Resend-Account-E-Mail** zustellen. Für echte Kunden-Mails: Domain in Resend verifizieren und `BOOKING_FROM_EMAIL` setzen.
+- HCQ erhält die Anmeldung
+- Anmelder erhält die Bestätigung (auch Spam prüfen)
+
+## Domain (für Produktion empfohlen)
+
+Mit `onboarding@resend.dev` kann Resend anfangs eingeschränkt zustellen.
+
+Für zuverlässige Kunden-Mails:
+
+1. In Resend eine Domain verifizieren (z. B. `hampacorequality.de`)
+2. `BOOKING_FROM_EMAIL` setzen auf z. B.  
+   `HCQ Zertifikatsschulung <anmeldung@hampacorequality.de>`
+3. Redeploy
+
+## Fehlercodes der API
+
+| Code | Bedeutung |
+| --- | --- |
+| `RESEND_NOT_CONFIGURED` | `RESEND_API_KEY` fehlt |
+| `OWNER_MAIL_FAILED` | Mail an HCQ fehlgeschlagen |
+| `CONFIRM_MAIL_FAILED` | Bestätigung an Anmelder fehlgeschlagen |
+
+Ohne Key schlägt die Buchung bewusst fehl (keine Schein-Erfolge).
