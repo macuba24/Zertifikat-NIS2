@@ -44,6 +44,12 @@ export type LeadEvent = LeadPayload & {
 export type SubmitResult = {
   mode: 'api' | 'formsubmit' | 'mailto'
   checkoutUrl?: string
+  /** Confirmation text shown on-page / used for mailto to applicant */
+  confirmation?: {
+    subject: string
+    text: string
+    to: string
+  }
 }
 
 const contactEmail =
@@ -52,6 +58,48 @@ const contactEmail =
 
 const BOOKING_ENDPOINT = '/api/booking'
 const WORKSHOP_WHEN = 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live via Google Meet)'
+
+export function buildBookingConfirmation(data: BookingPayload): {
+  subject: string
+  text: string
+  to: string
+} {
+  const subject = 'Buchungsbestätigung – Zertifikatsschulung NIS-2 / NISG 2026 / CRA'
+  const text = [
+    `Guten Tag ${data.gfName},`,
+    '',
+    'hiermit bestätigen wir Ihre Anmeldung zur Executive-Pflichtschulung.',
+    '',
+    `Teilnehmer: ${data.gfName}`,
+    `Unternehmen: ${data.company}`,
+    `E-Mail: ${data.email}`,
+    `Telefon: ${data.phone || '—'}`,
+    `Markt: ${data.market}`,
+    `Zahlungsart: ${data.paymentMethod}`,
+    '',
+    `Termin: ${WORKSHOP_WHEN}`,
+    'Preis: 1.000 € netto zzgl. MwSt.',
+    '',
+    'Als Nächstes erhalten Sie Checkout-Link oder Rechnung von uns.',
+    'Google-Meet-Zugang und Testat folgen erst nach Zahlungseingang',
+    '(spätestens 1 Woche vor dem Termin).',
+    '',
+    'Mit freundlichen Grüßen',
+    'HCQ Coaching and Compliant',
+    'Rainer Hampicke',
+    contactEmail,
+  ].join('\n')
+  return { subject, text, to: data.email }
+}
+
+export function openConfirmationMailto(confirmation: {
+  subject: string
+  text: string
+  to: string
+}): void {
+  const href = `mailto:${encodeURIComponent(confirmation.to)}?subject=${encodeURIComponent(confirmation.subject)}&body=${encodeURIComponent(confirmation.text)}&bcc=${encodeURIComponent(contactEmail)}`
+  window.location.href = href
+}
 
 type FallbackMeta = {
   to?: string
@@ -144,31 +192,25 @@ async function postFormSubmit(
       ? `Lead Zertifikatsschulung – ${participantName} / ${event.company}`
       : `Buchung Zertifikatsschulung – ${participantName} / ${event.company}`)
   const ownerText = meta.ownerText || defaultOwnerText(event)
-  const confirmText = meta.confirmText || defaultConfirmText(event)
 
-  const payload: Record<string, string> = {
-    _subject: ownerSubject,
-    _template: 'table',
-    _captcha: 'false',
-    name: participantName,
-    'Name des Teilnehmers': participantName,
-    email: event.email,
-    company: event.company,
-    message: ownerText,
-    event: event.event,
-    _autoresponse: confirmText,
-  }
+  const formData = new FormData()
+  formData.append('_subject', ownerSubject)
+  formData.append('_template', 'table')
+  formData.append('_captcha', 'false')
+  formData.append('name', participantName)
+  formData.append('Name des Teilnehmers', participantName)
+  formData.append('email', event.email)
+  formData.append('company', event.company)
+  formData.append('message', ownerText)
+  formData.append('event', event.event)
   if (event.email.includes('@')) {
-    payload._replyto = event.email
+    formData.append('_replyto', event.email)
   }
 
   const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(payload),
+    headers: { Accept: 'application/json' },
+    body: formData,
   })
 
   const text = await response.text()
@@ -197,7 +239,23 @@ async function postFormSubmit(
     )
   }
 
-  return { mode: 'formsubmit' }
+  // FormSubmit-Autoresponse ist unzuverlässig — Bestätigung separat per mailto an Teilnehmer.
+  if (event.event === 'booking.created' && event.email.includes('@')) {
+    const confirmation = buildBookingConfirmation(event)
+    return { mode: 'formsubmit', confirmation }
+  }
+
+  return {
+    mode: 'formsubmit',
+    confirmation:
+      event.event === 'lead.created'
+        ? {
+            subject: 'Anfrage eingegangen – Zertifikatsschulung',
+            text: defaultConfirmText(event),
+            to: event.email,
+          }
+        : undefined,
+  }
 }
 
 async function postEvent(
@@ -234,9 +292,20 @@ async function postEvent(
     }
 
     if (response.ok) {
+      const confirmation =
+        event.event === 'booking.created'
+          ? buildBookingConfirmation(event)
+          : event.email.includes('@')
+            ? {
+                subject: 'Anfrage eingegangen – Zertifikatsschulung',
+                text: defaultConfirmText(event),
+                to: event.email,
+              }
+            : undefined
       return {
         mode: 'api',
         checkoutUrl: typeof json.checkoutUrl === 'string' ? json.checkoutUrl : undefined,
+        confirmation,
       }
     }
 
@@ -269,16 +338,17 @@ async function postEvent(
 }
 
 function bookingMailto(data: BookingPayload): SubmitResult {
+  const confirmation = buildBookingConfirmation(data)
   const subject = encodeURIComponent(
-    `Buchung Executive-Pflichtschulung – ${data.company}`,
+    `Buchung Executive-Pflichtschulung – ${data.gfName} / ${data.company}`,
   )
   const body = encodeURIComponent(
     [
       '=== Buchungsanfrage ===',
+      `Name des Teilnehmers: ${data.gfName}`,
       `Unternehmen: ${data.company}`,
       `Rechtsform: ${data.legalForm}`,
       `USt-IdNr.: ${data.vatId || '—'}`,
-      `Name des Teilnehmers: ${data.gfName}`,
       `E-Mail: ${data.email}`,
       `Telefon: ${data.phone || '—'}`,
       `Markt: ${data.market}`,
@@ -286,7 +356,7 @@ function bookingMailto(data: BookingPayload): SubmitResult {
       '=== Rechnungsadresse ===',
       data.billingSame === 'on'
         ? 'Entspricht Unternehmenssitz'
-        : [`Straße: ${data.street}`, `PLZ/Ort: ${data.zip} ${data.city}`, `Land: ${data.country}`].join(
+        : [`Strasse: ${data.street}`, `PLZ/Ort: ${data.zip} ${data.city}`, `Land: ${data.country}`].join(
             '\n',
           ),
       '',
@@ -296,8 +366,9 @@ function bookingMailto(data: BookingPayload): SubmitResult {
       'Status: pending_payment | 1.000 € zzgl. MwSt.',
     ].join('\n'),
   )
-  window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`
-  return { mode: 'mailto' }
+  // Anfrage an HCQ + Bestätigung an Teilnehmer (BCC an HCQ).
+  window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}&cc=${encodeURIComponent(data.email)}`
+  return { mode: 'mailto', confirmation }
 }
 
 function leadMailto(data: LeadPayload): SubmitResult {

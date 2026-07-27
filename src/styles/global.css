@@ -696,7 +696,31 @@ ol {
 .form-success__text {
   color: var(--text-muted);
   margin-bottom: var(--space-3);
-  max-width: 36ch;
+  max-width: 42ch;
+}
+
+.form-success__receipt {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  text-align: left;
+}
+
+.form-success__receipt-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin: 0 0 0.75rem;
+  color: var(--accent);
+}
+
+.form-success__receipt-body {
+  margin: 0 0 var(--space-3);
+  white-space: pre-wrap;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--steel-100);
 }
 
 .form-error {

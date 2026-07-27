@@ -1,6 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import { cta } from '../content'
-import { submitBooking, type BookingPayload } from '../lib/booking'
+import {
+  buildBookingConfirmation,
+  openConfirmationMailto,
+  submitBooking,
+  type BookingPayload,
+} from '../lib/booking'
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error'
 type Step = 0 | 1 | 2
@@ -30,6 +35,9 @@ export function CtaForm() {
   const [step, setStep] = useState<Step>(0)
   const [billingSame, setBillingSame] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
+  const [confirmation, setConfirmation] = useState<ReturnType<
+    typeof buildBookingConfirmation
+  > | null>(null)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -49,6 +57,14 @@ export function CtaForm() {
         window.location.assign(result.checkoutUrl)
         return
       }
+
+      const conf = result.confirmation ?? buildBookingConfirmation(payload)
+      setConfirmation(conf)
+
+      // Bestätigung zuverlässig an Teilnehmer: Mail-Client mit fertiger Bestätigung öffnen.
+      // Absenden legt die Bestätigung im eigenen Postfach ab (und BCC an HCQ).
+      window.setTimeout(() => openConfirmationMailto(conf), 400)
+
       setState('success')
       setStep(0)
       form.reset()
@@ -77,10 +93,26 @@ export function CtaForm() {
           <div className="form-success" role="status">
             <h3 className="form-success__title">{cta.successTitle}</h3>
             <p className="form-success__text">{cta.successText}</p>
+            {confirmation && (
+              <div className="form-success__receipt">
+                <h4 className="form-success__receipt-title">Ihre Buchungsbestätigung</h4>
+                <pre className="form-success__receipt-body">{confirmation.text}</pre>
+                <button
+                  type="button"
+                  className="btn btn--primary"
+                  onClick={() => openConfirmationMailto(confirmation)}
+                >
+                  Bestätigung per E-Mail öffnen
+                </button>
+              </div>
+            )}
             <button
               type="button"
               className="btn btn--ghost"
-              onClick={() => setState('idle')}
+              onClick={() => {
+                setState('idle')
+                setConfirmation(null)
+              }}
             >
               Weitere Buchung
             </button>
@@ -183,35 +215,33 @@ export function CtaForm() {
                   </label>
                 </div>
               )}
-              {billingSame && (
-                <p className="funnel-hint">
-                  Rechnungsadresse = Unternehmenssitz. Abweichende Adresse können Sie per Haken oben freischalten.
-                </p>
-              )}
             </div>
 
             <div hidden={step !== 2}>
-              <label className="field field--full">
-                <span className="field__label">{cta.fields.paymentMethod}</span>
-                <select className="field__input" name="paymentMethod" required={step === 2} defaultValue="">
-                  <option value="" disabled>
-                    Bitte wählen
-                  </option>
-                  {cta.paymentOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
+              <p className="funnel-hint">Zahlung vor Zugang — Google Meet und Testat erst nach Geldeingang.</p>
+              <div className="cta-form__grid">
+                <label className="field field--full">
+                  <span className="field__label">{cta.fields.paymentMethod}</span>
+                  <select className="field__input" name="paymentMethod" required={step === 2} defaultValue="">
+                    <option value="" disabled>
+                      Bitte wählen
                     </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field field--full">
-                <span className="field__label">{cta.fields.notes}</span>
-                <textarea className="field__input field__input--area" name="notes" rows={3} />
-              </label>
-              <label className="field field--check">
-                <input type="checkbox" name="acceptTerms" required={step === 2} />
-                <span>{cta.fields.acceptTerms}</span>
-              </label>
+                    {cta.paymentOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field field--full">
+                  <span className="field__label">{cta.fields.notes}</span>
+                  <textarea className="field__input field__input--area" name="notes" rows={3} />
+                </label>
+                <label className="field field--check field--full">
+                  <input type="checkbox" name="acceptTerms" required={step === 2} />
+                  <span>{cta.fields.acceptTerms}</span>
+                </label>
+              </div>
             </div>
 
             {state === 'error' && (
@@ -225,18 +255,13 @@ export function CtaForm() {
                 <button
                   type="button"
                   className="btn btn--ghost"
-                  disabled={state === 'submitting'}
                   onClick={() => setStep((step - 1) as Step)}
                 >
                   {cta.back}
                 </button>
               )}
-              <button className="btn btn--primary" type="submit" disabled={state === 'submitting'}>
-                {state === 'submitting'
-                  ? cta.submitting
-                  : step === 2
-                    ? cta.submit
-                    : cta.next}
+              <button type="submit" className="btn btn--primary btn--wide" disabled={state === 'submitting'}>
+                {state === 'submitting' ? cta.submitting : step < 2 ? cta.next : cta.submit}
               </button>
             </div>
           </form>

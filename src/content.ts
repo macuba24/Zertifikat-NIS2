@@ -84,7 +84,7 @@ export const cta = {
   back: 'Zurück',
   successTitle: 'Anmeldung eingegangen',
   successText:
-    'Wir haben Ihre Anmeldung erhalten. Eine Bestätigungsmail geht an die angegebene Adresse (bitte auch Spam prüfen). Als Nächstes folgt Checkout oder Rechnung. Google-Meet-Link erst nach Zahlungseingang; Testat nach Workshop und Freigabe.',
+    'Anmeldung ist gespeichert. Unten sehen Sie Ihre Buchungsbestätigung. Zusätzlich öffnet sich Ihr E-Mail-Programm mit der Bestätigung an Ihre Adresse — bitte absenden, dann liegt sie in Ihrem Postfach.',
   fields: {
     company: 'Unternehmen',
     legalForm: 'Rechtsform',
