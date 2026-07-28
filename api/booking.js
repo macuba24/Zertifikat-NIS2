@@ -7,7 +7,7 @@
  */
 
 const DEFAULT_TO = 'info@hampacorequality.de'
-const DEFAULT_FROM = 'HCQ Zertifikatsschulung <onboarding@resend.dev>'
+const DEFAULT_FROM = 'HCQ Zertifikatsschulung <info@hampacorequality.de>'
 const WORKSHOP_WHEN = 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live via Google Meet)'
 
 function asString(value, fallback = '—') {
