@@ -1,13 +1,14 @@
 /**
  * Kontakt-/Lead-Formular via Resend:
- * 1) Bestätigungsmail an Kunden (zuerst)
- * 2) Benachrichtigung an HCQ (inkl. Hinweis, wohin die Bestätigung ging)
+ * 1) Bestätigungsmail an Kunden (ohne „Audit Ready Lead“)
+ * 2) Interne Benachrichtigung an HCQ (mit „Audit Ready Lead“)
  *
  * Pflicht: RESEND_API_KEY
  */
 
 const DEFAULT_TO = 'info@hampacorequality.de'
-const DEFAULT_FROM = 'Audit Ready Lead <info@hampacorequality.de>'
+const CUSTOMER_FROM = 'Hampa Core Quality <info@hampacorequality.de>'
+const INTERNAL_FROM = 'Audit Ready Lead <info@hampacorequality.de>'
 
 function asString(value, fallback = '') {
   if (typeof value === 'string') return value.trim()
@@ -97,13 +98,14 @@ export default async function handler(req, res) {
   }
 
   const to = asString(process.env.CONTACT_TO_EMAIL || process.env.BOOKING_TO_EMAIL, DEFAULT_TO)
-  const from = asString(process.env.CONTACT_FROM_EMAIL, DEFAULT_FROM)
+  const internalFrom = asString(process.env.CONTACT_FROM_EMAIL, INTERNAL_FROM)
+  const customerFrom = asString(process.env.CONTACT_CUSTOMER_FROM_EMAIL, CUSTOMER_FROM)
 
   const greeting = name ? `Guten Tag ${name},` : 'Guten Tag,'
   const confirmText = [
     greeting,
     '',
-    'vielen Dank für Ihre Anfrage an Audit Ready Lead / Hampa Core Quality.',
+    'vielen Dank für Ihre Anfrage an Hampa Core Quality.',
     'Wir haben Ihre Nachricht erhalten und melden uns innerhalb von 24 Stunden.',
     '',
     `Unternehmen: ${company}`,
@@ -120,7 +122,7 @@ export default async function handler(req, res) {
 
   const confirmHtml = `<!doctype html><html><body style="background:#f4f7fb;padding:24px;">
   <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #d7e2ec;padding:24px;">
-    <p style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#1aa3a3;">Audit Ready Lead</p>
+    <p style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#1aa3a3;">Hampa Core Quality</p>
     ${confirmText
       .split('\n')
       .map(
@@ -131,16 +133,15 @@ export default async function handler(req, res) {
   </div>
 </body></html>`
 
-  // 1) Kundenbestätigung zuerst – ohne sie kein Erfolg
+  // 1) Kundenbestätigung – ohne „Audit Ready Lead“
   const confirmationPayload = {
-    from,
+    from: customerFrom,
     to: [email],
     reply_to: to,
-    subject: 'Audit Ready Lead – Bestätigung Ihrer Anfrage',
+    subject: 'Bestätigung Ihrer Anfrage – Hampa Core Quality',
     text: confirmText,
     html: confirmHtml,
   }
-  // Kopie an HCQ, damit sichtbar ist, dass die Kundenmail rausging
   if (email.toLowerCase() !== to.toLowerCase()) {
     confirmationPayload.bcc = [to]
   }
@@ -157,6 +158,7 @@ export default async function handler(req, res) {
   }
 
   const ownerText = [
+    '=== Audit Ready Lead ===',
     '=== Website-Anfrage ===',
     `Quelle: ${source}`,
     `Name: ${name}`,
@@ -170,16 +172,16 @@ export default async function handler(req, res) {
     message || '—',
   ].join('\n')
 
+  // 2) Interne HCQ-Mail – mit „Audit Ready Lead“
   const owner = await sendResend(apiKey, {
-    from,
+    from: internalFrom,
     to: [to],
     reply_to: email,
-    subject: 'NIS2 Audit ready check',
+    subject: 'Audit Ready Lead – NIS2 Audit ready check',
     text: ownerText,
   })
 
   if (!owner.ok) {
-    // Kunde hat Bestätigung bereits – HCQ-Mail nachziehen-Fehler transparent melden
     return res.status(502).json({
       error: 'OWNER_MAIL_FAILED',
       ok: false,
