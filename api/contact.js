@@ -1,7 +1,7 @@
 /**
  * Kontakt-/Lead-Formular via Resend:
- * 1) Benachrichtigung an HCQ
- * 2) Bestätigungsmail an Absender
+ * 1) Bestätigungsmail an Kunden (zuerst)
+ * 2) Benachrichtigung an HCQ (inkl. Hinweis, wohin die Bestätigung ging)
  *
  * Pflicht: RESEND_API_KEY
  */
@@ -27,7 +27,7 @@ function escapeHtml(value) {
     .replaceAll('"', '&quot;')
 }
 
-async function sendResend(apiKey, payload) {
+async function sendResend(apiKey, payload, attempt = 1) {
   const upstream = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -45,6 +45,11 @@ async function sendResend(apiKey, payload) {
     } catch {
       parsed = { raw }
     }
+  }
+
+  if (!upstream.ok && attempt < 2 && upstream.status >= 500) {
+    await new Promise((r) => setTimeout(r, 600))
+    return sendResend(apiKey, payload, attempt + 1)
   }
 
   return { ok: upstream.ok, status: upstream.status, parsed }
@@ -82,7 +87,7 @@ export default async function handler(req, res) {
 
   const name = asString(body.name)
   const company = asString(body.company)
-  const email = asString(body.email)
+  const email = asString(body.email).toLowerCase()
   const phone = asString(body.phone)
   const message = asString(body.message)
   const source = asString(body.source, 'website')
@@ -94,43 +99,12 @@ export default async function handler(req, res) {
   const to = asString(process.env.CONTACT_TO_EMAIL || process.env.BOOKING_TO_EMAIL, DEFAULT_TO)
   const from = asString(process.env.CONTACT_FROM_EMAIL, DEFAULT_FROM)
 
-  const ownerText = [
-    '=== Website-Anfrage ===',
-    `Quelle: ${source}`,
-    `Name: ${name}`,
-    `Unternehmen: ${company}`,
-    `E-Mail: ${email}`,
-    `Telefon: ${phone}`,
-    '',
-    'Nachricht:',
-    message || '—',
-  ].join('\n')
-
-  const owner = await sendResend(apiKey, {
-    from,
-    to: [to],
-    reply_to: email,
-    subject: 'NIS2 Audit ready check',
-    text: ownerText,
-  })
-
-  if (!owner.ok) {
-    return res.status(502).json({
-      error: 'OWNER_MAIL_FAILED',
-      ok: false,
-      detail: owner.parsed,
-      status: owner.status,
-    })
-  }
-
   const greeting = name ? `Guten Tag ${name},` : 'Guten Tag,'
   const confirmText = [
     greeting,
     '',
     'vielen Dank für Ihre Anfrage an Audit Ready Lead / Hampa Core Quality.',
     'Wir haben Ihre Nachricht erhalten und melden uns innerhalb von 24 Stunden.',
-    '',
-    'Falls Sie diese Mail nicht erwartet haben, antworten Sie einfach kurz oder ignorieren Sie sie.',
     '',
     `Unternehmen: ${company}`,
     `Telefon: ${phone}`,
@@ -157,22 +131,62 @@ export default async function handler(req, res) {
   </div>
 </body></html>`
 
-  const confirmation = await sendResend(apiKey, {
+  // 1) Kundenbestätigung zuerst – ohne sie kein Erfolg
+  const confirmationPayload = {
     from,
     to: [email],
     reply_to: to,
-    subject: 'Audit Ready Lead – wir haben Ihre Anfrage erhalten',
+    subject: 'Audit Ready Lead – Bestätigung Ihrer Anfrage',
     text: confirmText,
     html: confirmHtml,
-  })
+  }
+  // Kopie an HCQ, damit sichtbar ist, dass die Kundenmail rausging
+  if (email.toLowerCase() !== to.toLowerCase()) {
+    confirmationPayload.bcc = [to]
+  }
+
+  const confirmation = await sendResend(apiKey, confirmationPayload)
 
   if (!confirmation.ok) {
     return res.status(502).json({
       error: 'CONFIRM_MAIL_FAILED',
       ok: false,
-      ownerId: owner.parsed.id ?? null,
       detail: confirmation.parsed,
       status: confirmation.status,
+    })
+  }
+
+  const ownerText = [
+    '=== Website-Anfrage ===',
+    `Quelle: ${source}`,
+    `Name: ${name}`,
+    `Unternehmen: ${company}`,
+    `E-Mail: ${email}`,
+    `Telefon: ${phone}`,
+    `Kunden-Bestätigung gesendet an: ${email}`,
+    `Bestätigungs-ID: ${confirmation.parsed.id ?? '—'}`,
+    '',
+    'Nachricht:',
+    message || '—',
+  ].join('\n')
+
+  const owner = await sendResend(apiKey, {
+    from,
+    to: [to],
+    reply_to: email,
+    subject: 'NIS2 Audit ready check',
+    text: ownerText,
+  })
+
+  if (!owner.ok) {
+    // Kunde hat Bestätigung bereits – HCQ-Mail nachziehen-Fehler transparent melden
+    return res.status(502).json({
+      error: 'OWNER_MAIL_FAILED',
+      ok: false,
+      confirmationId: confirmation.parsed.id ?? null,
+      confirmationEmailSent: true,
+      detail: owner.parsed,
+      status: owner.status,
     })
   }
 
@@ -181,5 +195,6 @@ export default async function handler(req, res) {
     ownerId: owner.parsed.id ?? null,
     confirmationId: confirmation.parsed.id ?? null,
     confirmationEmailSent: true,
+    confirmationTo: email,
   })
 }
