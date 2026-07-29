@@ -2,25 +2,43 @@ export const brand = 'Zertifikatsschulung'
 
 export const contactEmail = 'anmeldung@zertifikatsschulung.de'
 
+export const urgency = {
+  text: '🔥 Nächster Termin: 15. August 2026 | Noch 7 von 12 Plätzen frei',
+}
+
 export const hero = {
   brand,
   headline: 'NIS-2, NISG 2026 & CRA: Die persönliche Haftungsfalle für Geschäftsführer.',
   subline:
     'Erfüllen Sie Ihre gesetzliche Pflicht nach § 38 BSIG (DE) bzw. NISG 2026 / § 31 (AT) in nur 3 Stunden – ohne juristisches Blabla.',
+  priceLine: '1.000 € netto · Max. 12 Teilnehmer · DE & AT',
   facts: [
-    { label: 'Der Termin', text: 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live via Google Meet)' },
+    {
+      label: 'Der Termin',
+      text: 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live-Online-Schulung)',
+    },
     {
       label: 'Der Nutzen',
       text: 'Rechtssicherer Teilnahmenachweis für Audit & Aufsicht – DE (BSI) und AT (NISG 2026)',
     },
-    {
-      label: 'Dein Profil',
-      text: '25 Jahre Industrie- & Automobil-Erfahrung (Kein theoretisches Berater-Bla-Bla).',
-    },
   ],
+  speaker: {
+    label: 'Ihr Referent',
+    name: 'Rainer Hampicke',
+    title: '25 Jahre Industrie- & Automobil-Erfahrung — kein theoretisches Berater-Bla-Bla.',
+    photo: '/rainer-hampicke.png',
+    photoAlt: 'Rainer Hampicke, Referent der NIS-2 Führungskräfte-Schulung',
+  },
   primaryCta: 'Jetzt Platz sichern',
   price: '1.000 € netto',
   seats: 'Max. 12 Teilnehmer · DE & AT',
+}
+
+export const guarantee = {
+  title: 'Zufriedenheit oder Geld zurück',
+  text: '1.000 € netto. Wenn Ihnen die Schulung nichts bringt, bekommen Sie Ihr Geld zurück. Kein Kleingedrucktes. Ein Handshake reicht.',
+  why: 'Warum? Weil ich aus der Praxis komme. Ich weiß, was ich leiste.',
+  cta: 'Jetzt Platz sichern',
 }
 
 export const problem = {
@@ -30,6 +48,8 @@ export const problem = {
     'Nach § 38 BSIG (DE), NISG 2026 / § 31 (AT) und dem Cyber Resilience Act haftet die Geschäftsführung persönlich – Schulungspflicht für Leitungsorgane inklusive.',
     'Ein Wirtschaftsprüfer will im Audit keinen Folienstapel sehen, sondern Ihren dokumentierten Nachweis der Sorgfaltspflicht.',
   ],
+  cta: 'Jetzt Platz sichern – Haftung dokumentieren',
+  ctaHint: '3 Stunden · Testat für Audit · 1.000 € netto',
 }
 
 export const agenda = {
@@ -51,6 +71,7 @@ export const agenda = {
       text: 'Konkrete Handlungsanweisungen und Freigabe für Ihr Audit.',
     },
   ],
+  cta: 'Jetzt Platz sichern',
 }
 
 export const rules = {
@@ -62,7 +83,7 @@ export const rules = {
     },
     {
       title: 'Die Bedingung',
-      text: 'Google-Meet-Link und Audit-Testat gibt es erst nach Zahlungseingang (spätestens 1 Woche vor dem Termin). Kein Geld vorab = kein Einlass.',
+      text: 'Zahlungseingang erforderlich: Testat und Zugang werden nach Bezahlung freigeschaltet (spätestens 1 Woche vor Termin).',
     },
     {
       title: 'Das Testat',
@@ -76,7 +97,7 @@ export const rules = {
 export const cta = {
   id: 'anmeldung',
   title: 'Platz sichern',
-  lead: 'Max. 12 Teilnehmer (DE & AT). Nach Anmeldung: Checkout oder Rechnung. Google Meet und Testat erst nach Zahlungseingang.',
+  lead: 'Max. 12 Teilnehmer (DE & AT). Nach Anmeldung: Checkout oder Rechnung. Zugang und Testat erst nach Zahlungseingang.',
   steps: ['Unternehmen', 'Rechnung', 'Zahlung'],
   submit: 'Verbindlich buchen',
   submitting: 'Wird übermittelt…',
@@ -84,7 +105,7 @@ export const cta = {
   back: 'Zurück',
   successTitle: 'Anmeldung eingegangen',
   successTextEmailSent:
-    'Wir haben Ihre Anmeldung erhalten und eine Bestätigungsmail an Ihre E-Mail-Adresse gesendet (bitte auch den Spam-Ordner prüfen). Google-Meet-Link und Testat folgen nach Zahlungseingang.',
+    'Wir haben Ihre Anmeldung erhalten und eine Bestätigungsmail an Ihre E-Mail-Adresse gesendet (bitte auch den Spam-Ordner prüfen). Zugangslink und Testat folgen nach Zahlungseingang.',
   successTextOnPageOnly:
     'Wir haben Ihre Anmeldung erhalten. Unten steht Ihre Buchungsbestätigung zum Speichern. Die Bestätigungsmail konnte nicht zugestellt werden — bitte kontaktieren Sie uns unter info@hampacorequality.de.',
   fields: {
@@ -123,13 +144,12 @@ export const footer = {
   agb: 'AGB / Bedingungen',
   impressumTitle: 'Impressum',
   impressumBlocks: [
-    'Angaben gemäß § 5 TMG bzw. § 5 ECG (Platzhalter – bitte vor Go-Live ersetzen):',
-    'Anbieter: [Name / Firma]',
-    'Anschrift: [Straße, PLZ Ort]',
-    'Kontakt: [E-Mail / Telefon]',
-    'Vertretungsberechtigt: [Name]',
-    'USt-IdNr.: [falls vorhanden]',
-    'Verantwortlich für den Inhalt: [Name, Anschrift]',
+    'Angaben gemäß § 5 DDG:',
+    'Anbieter: Hampa Core Quality',
+    'R. Hampicke',
+    'Anschrift: Römerstraße 40, 56294 Münstermailfeld',
+    'Kontakt: info@hampacorequality.de · Festnetz +49 (0)2605 848777 · Mobil +49 (0)15565 594897',
+    'Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV: R. Hampicke, Römerstraße 40, 56294 Münstermailfeld',
   ],
   datenschutzTitle: 'Datenschutz',
   datenschutzBlocks: [
@@ -141,9 +161,10 @@ export const footer = {
   termsTitle: 'Zahlungs- und Teilnahmebedingungen (Kurzfassung)',
   termsBlocks: [
     '1.000 € zzgl. MwSt./USt. pro Teilnehmer. Max. 12 Teilnehmer. Für DE und AT.',
-    'Zahlung spätestens 1 Woche vor dem Termin. Ohne Zahlungseingang: kein Google-Meet-Link, kein Einlass, kein Testat.',
+    'Zahlungseingang erforderlich: Testat und Zugang werden nach Bezahlung freigeschaltet (spätestens 1 Woche vor Termin).',
     'Testat: fachliche Bestätigung der Unterweisung (§ 38 BSIG / NISG 2026 / CRA) – kein behördliches Siegel.',
     'Übertragbarkeit auf einen Stellvertreter derselben Organisation oder Gutschrift auf den nächsten Termin gemäß Buchungsbestätigung.',
     'Keine individuelle Rechts- oder Steuerberatung.',
+    'Zufriedenheitsgarantie: Wenn Ihnen die Schulung nichts bringt, bekommen Sie Ihr Geld zurück — ohne Kleingedrucktes.',
   ],
 }
