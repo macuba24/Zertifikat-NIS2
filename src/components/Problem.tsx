@@ -14,6 +14,12 @@ export function Problem() {
             </p>
           ))}
         </div>
+        <div className="section__cta section__cta--emphasis">
+          <a className="btn btn--primary btn--wide" href="#anmeldung">
+            {problem.cta}
+          </a>
+          <p className="section__cta-hint">{problem.ctaHint}</p>
+        </div>
       </div>
     </section>
   )

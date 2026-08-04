@@ -154,6 +154,35 @@ ol {
   max-width: 20rem;
 }
 
+/* —— Urgency —— */
+
+.urgency-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding:
+    max(0.55rem, env(safe-area-inset-top, 0px))
+    clamp(0.75rem, 3vw, 1.5rem)
+    0.55rem;
+  background: linear-gradient(90deg, #8a6420 0%, var(--accent-deep) 40%, #8a6420 100%);
+  color: var(--navy-950);
+  text-align: center;
+}
+
+.urgency-bar__text {
+  margin: 0;
+  font-size: clamp(0.78rem, 2.4vw, 0.92rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+}
+
 /* —— Hero —— */
 
 .hero {
@@ -165,13 +194,14 @@ ol {
   justify-content: center;
   align-items: center;
   padding:
-    max(4.5rem, calc(env(safe-area-inset-top, 0px) + 3.5rem))
+    max(6.5rem, calc(env(safe-area-inset-top, 0px) + 5.25rem))
     clamp(1rem, 4vw, 3rem)
     max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem));
   isolation: isolate;
   text-align: center;
   box-sizing: border-box;
   width: 100%;
+  gap: var(--space-4);
 }
 
 .hero__backdrop {
@@ -211,17 +241,14 @@ ol {
 
 .hero__nav {
   position: absolute;
-  top: 0;
+  top: 2.6rem;
   left: 0;
   right: 0;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding:
-    max(0.85rem, env(safe-area-inset-top, 0px))
-    clamp(1rem, 4vw, 3rem)
-    0.85rem;
+  padding: 0.65rem clamp(1rem, 4vw, 3rem) 0.65rem;
 }
 
 .hero__logo {
@@ -290,6 +317,14 @@ ol {
   word-break: break-word;
 }
 
+.hero__price-line {
+  margin: 0 0 var(--space-3);
+  font-size: clamp(1.05rem, 2.8vw, 1.2rem);
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
 .hero__subline {
   color: var(--steel-100);
   max-width: 40ch;
@@ -334,6 +369,49 @@ ol {
   overflow-wrap: anywhere;
 }
 
+.hero__fact--speaker {
+  padding-top: 0.35rem;
+}
+
+.speaker {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 0.35rem;
+}
+
+.speaker__photo {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  flex-shrink: 0;
+  border: 2px solid var(--accent);
+  background: var(--navy-800);
+}
+
+.speaker__meta {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+  text-align: left;
+}
+
+.speaker__name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.speaker__title {
+  color: var(--steel-100);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
@@ -349,6 +427,67 @@ ol {
 
 .hero__seats {
   font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--steel-300);
+}
+
+.guarantee {
+  width: min(100%, 40rem);
+  margin-top: var(--space-2);
+  padding: var(--space-3) clamp(1rem, 3vw, 1.75rem);
+  border: 1px solid rgba(212, 168, 75, 0.45);
+  background:
+    linear-gradient(165deg, rgba(212, 168, 75, 0.12), rgba(15, 34, 51, 0.92) 55%),
+    var(--surface);
+  text-align: left;
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+.guarantee__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.guarantee__title {
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  max-width: 18ch;
+}
+
+.guarantee__text,
+.guarantee__why {
+  margin: 0;
+  color: var(--steel-100);
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 42ch;
+}
+
+.guarantee__why {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.section__cta {
+  margin-top: var(--space-4);
+}
+
+.section__cta--emphasis {
+  display: grid;
+  gap: 0.65rem;
+  justify-items: start;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.section__cta-hint {
+  margin: 0;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--steel-300);
 }
@@ -849,8 +988,28 @@ ol {
   .hero {
     min-height: auto;
     justify-content: flex-start;
-    padding-top: max(4.25rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
+    padding-top: max(6.25rem, calc(env(safe-area-inset-top, 0px) + 5rem));
     padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px) + 1.5rem);
+  }
+
+  .urgency-bar__text {
+    font-size: 0.78rem;
+  }
+
+  .hero__nav {
+    top: 2.85rem;
+  }
+
+  .guarantee {
+    text-align: left;
+  }
+
+  .guarantee .btn {
+    width: 100%;
+  }
+
+  .speaker {
+    align-items: flex-start;
   }
 
   .hero__logo--hero {

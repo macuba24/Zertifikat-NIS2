@@ -18,6 +18,11 @@ export function Agenda() {
             </li>
           ))}
         </ol>
+        <div className="section__cta">
+          <a className="btn btn--primary" href="#anmeldung">
+            {agenda.cta}
+          </a>
+        </div>
       </div>
     </section>
   )

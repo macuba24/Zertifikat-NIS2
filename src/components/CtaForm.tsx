@@ -212,7 +212,10 @@ export function CtaForm() {
             </div>
 
             <div hidden={step !== 2}>
-              <p className="funnel-hint">Zahlung vor Zugang — Google Meet und Testat erst nach Geldeingang.</p>
+              <p className="funnel-hint">
+                Zahlungseingang erforderlich: Testat und Zugang werden nach Bezahlung freigeschaltet
+                (spätestens 1 Woche vor Termin).
+              </p>
               <div className="cta-form__grid">
                 <label className="field field--full">
                   <span className="field__label">{cta.fields.paymentMethod}</span>
