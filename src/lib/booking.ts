@@ -27,7 +27,7 @@ export type BookingEvent = BookingPayload & {
   event: 'booking.created'
   status: 'pending_payment'
   product: 'nis2-nisg2026-cra-executive-workshop'
-  priceNetEur: 1000
+  priceNetEur: 500
   currency: 'EUR'
   createdAt: string
   source: 'landingpage'
@@ -53,7 +53,7 @@ export type SubmitResult = {
 }
 
 const BOOKING_ENDPOINT = '/api/booking'
-const WORKSHOP_WHEN = 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live via Google Meet)'
+const WORKSHOP_WHEN = 'Samstag, 12.09.2026, 09:00 – 12:00 Uhr (Live-Online-Schulung)'
 const contactEmail =
   (import.meta.env.VITE_CONTACT_EMAIL as string | undefined) ||
   'info@hampacorequality.de'
@@ -77,10 +77,10 @@ export function buildBookingConfirmation(data: BookingPayload): {
     `Zahlungsart: ${data.paymentMethod}`,
     '',
     `Termin: ${WORKSHOP_WHEN}`,
-    'Preis: 1.000 € netto zzgl. MwSt.',
+    'Preis: 500 € netto zzgl. MwSt.',
     '',
     'Als Nächstes erhalten Sie Checkout-Link oder Rechnung von uns.',
-    'Google-Meet-Zugang und Testat folgen erst nach Zahlungseingang',
+    'Zugang und Testat folgen erst nach Zahlungseingang',
     '(spätestens 1 Woche vor dem Termin).',
     '',
     'Mit freundlichen Grüßen',
@@ -136,7 +136,7 @@ export async function submitBooking(data: BookingPayload): Promise<SubmitResult>
     event: 'booking.created',
     status: 'pending_payment',
     product: 'nis2-nisg2026-cra-executive-workshop',
-    priceNetEur: 1000,
+    priceNetEur: 500,
     currency: 'EUR',
     createdAt: new Date().toISOString(),
     source: 'landingpage',

@@ -8,7 +8,7 @@
 
 const DEFAULT_TO = 'info@hampacorequality.de'
 const DEFAULT_FROM = 'HCQ Zertifikatsschulung <info@hampacorequality.de>'
-const WORKSHOP_WHEN = 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live via Google Meet)'
+const WORKSHOP_WHEN = 'Samstag, 12.09.2026, 09:00 – 12:00 Uhr (Live-Online-Schulung)'
 
 function asString(value, fallback = '—') {
   if (typeof value === 'string' && value.trim()) return value.trim()
@@ -77,7 +77,7 @@ function buildOwnerText(body) {
     `Zahlungsart: ${asString(body.paymentMethod)}`,
     `Bemerkung: ${asString(body.notes)}`,
     `Status: ${asString(body.status, 'pending_payment')}`,
-    `Preis: ${asString(body.priceNetEur, '1000')} ${asString(body.currency, 'EUR')} netto`,
+    `Preis: ${asString(body.priceNetEur, '500')} ${asString(body.currency, 'EUR')} netto`,
     `Termin: ${WORKSHOP_WHEN}`,
     `Zeitpunkt: ${asString(body.createdAt)}`,
   ].join('\n')
@@ -123,10 +123,10 @@ function buildConfirmText(body) {
     `Zahlungsart: ${asString(body.paymentMethod)}`,
     '',
     `Termin: ${WORKSHOP_WHEN}`,
-    'Preis: 1.000 € netto zzgl. MwSt.',
+    'Preis: 500 € netto zzgl. MwSt.',
     '',
     'Als Nächstes erhalten Sie Checkout-Link oder Rechnung.',
-    'Google-Meet-Zugang und Testat folgen erst nach Zahlungseingang',
+    'Zugang und Testat folgen erst nach Zahlungseingang',
     '(spätestens 1 Woche vor dem Termin).',
     '',
     'Mit freundlichen Grüßen',

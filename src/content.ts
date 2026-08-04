@@ -3,7 +3,7 @@ export const brand = 'Zertifikatsschulung'
 export const contactEmail = 'anmeldung@zertifikatsschulung.de'
 
 export const urgency = {
-  text: '🔥 Nächster Termin: 15. August 2026 | Noch 7 von 12 Plätzen frei',
+  text: '🔥 Nächster Termin: 12. September 2026 | Noch 7 von 12 Plätzen frei',
 }
 
 export const hero = {
@@ -11,11 +11,11 @@ export const hero = {
   headline: 'NIS-2, NISG 2026 & CRA: Die persönliche Haftungsfalle für Geschäftsführer.',
   subline:
     'Erfüllen Sie Ihre gesetzliche Pflicht nach § 38 BSIG (DE) bzw. NISG 2026 / § 31 (AT) in nur 3 Stunden – ohne juristisches Blabla.',
-  priceLine: '1.000 € netto · Max. 12 Teilnehmer · DE & AT',
+  priceLine: '500 € netto · Max. 12 Teilnehmer · DE & AT',
   facts: [
     {
       label: 'Der Termin',
-      text: 'Samstag, 15.08.2026, 09:00 – 12:00 Uhr (Live-Online-Schulung)',
+      text: 'Samstag, 12.09.2026, 09:00 – 12:00 Uhr (Live-Online-Schulung)',
     },
     {
       label: 'Der Nutzen',
@@ -30,13 +30,13 @@ export const hero = {
     photoAlt: 'Rainer Hampicke, Referent der NIS-2 Führungskräfte-Schulung',
   },
   primaryCta: 'Jetzt Platz sichern',
-  price: '1.000 € netto',
+  price: '500 € netto',
   seats: 'Max. 12 Teilnehmer · DE & AT',
 }
 
 export const guarantee = {
   title: 'Zufriedenheit oder Geld zurück',
-  text: '1.000 € netto. Wenn Ihnen die Schulung nichts bringt, bekommen Sie Ihr Geld zurück. Kein Kleingedrucktes. Ein Handshake reicht.',
+  text: '500 € netto. Wenn Ihnen die Schulung nichts bringt, bekommen Sie Ihr Geld zurück. Kein Kleingedrucktes. Ein Handshake reicht.',
   why: 'Warum? Weil ich aus der Praxis komme. Ich weiß, was ich leiste.',
   cta: 'Jetzt Platz sichern',
 }
@@ -49,7 +49,7 @@ export const problem = {
     'Ein Wirtschaftsprüfer will im Audit keinen Folienstapel sehen, sondern Ihren dokumentierten Nachweis der Sorgfaltspflicht.',
   ],
   cta: 'Jetzt Platz sichern – Haftung dokumentieren',
-  ctaHint: '3 Stunden · Testat für Audit · 1.000 € netto',
+  ctaHint: '3 Stunden · Testat für Audit · 500 € netto',
 }
 
 export const agenda = {
@@ -79,7 +79,7 @@ export const rules = {
   items: [
     {
       title: 'Investition',
-      text: '1.000 € zzgl. MwSt. / USt. pro Teilnehmer.',
+      text: '500 € zzgl. MwSt. / USt. pro Teilnehmer.',
     },
     {
       title: 'Die Bedingung',
@@ -160,7 +160,7 @@ export const footer = {
   ],
   termsTitle: 'Zahlungs- und Teilnahmebedingungen (Kurzfassung)',
   termsBlocks: [
-    '1.000 € zzgl. MwSt./USt. pro Teilnehmer. Max. 12 Teilnehmer. Für DE und AT.',
+    '500 € zzgl. MwSt./USt. pro Teilnehmer. Max. 12 Teilnehmer. Für DE und AT.',
     'Zahlungseingang erforderlich: Testat und Zugang werden nach Bezahlung freigeschaltet (spätestens 1 Woche vor Termin).',
     'Testat: fachliche Bestätigung der Unterweisung (§ 38 BSIG / NISG 2026 / CRA) – kein behördliches Siegel.',
     'Übertragbarkeit auf einen Stellvertreter derselben Organisation oder Gutschrift auf den nächsten Termin gemäß Buchungsbestätigung.',
